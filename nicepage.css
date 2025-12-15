@@ -46924,18 +46924,17 @@ a.u-link.u-text-hover-color-var:hover {
 }
 @media (max-width: 767px) {
   .u-header .u-sheet-1 {
-    min-height: 66px;
+    min-height: 65px;
   }
 
   .u-header .u-image-2 {
-    margin-top: 0;
-    margin-left: 206px;
+    height: 64px;
+    margin-top: 1px;
   }
 
   .u-header .u-btn-1 {
-    margin-top: 20px;
-    margin-right: 300px;
-    margin-bottom: 30px;
+    margin-top: -55px;
+    margin-bottom: 10px;
   }
 }
 @media (max-width: 575px) {
@@ -46957,7 +46956,6 @@ a.u-link.u-text-hover-color-var:hover {
 
   .u-header .u-btn-1 {
     margin-top: -60px;
-    margin-right: 0;
     margin-bottom: 14px;
   }
 }
