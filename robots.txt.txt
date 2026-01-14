@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+# ใส่ลิงก์ไปยัง Sitemap ของคุณ (ถ้ามี)
+# Sitemap: https://wswss.com/sitemap.xml
