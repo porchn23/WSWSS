@@ -28,14 +28,14 @@ test('SEO and AI discovery metadata describe the approved product without SPF cl
   assert.match(html, /rel="manifest"[^>]*assets\/favicon_io\/site\.webmanifest/i);
   assert.match(html, /application\/ld\+json/);
   assert.match(html, /styles\.css\?v=20260812-58/);
-  assert.match(html, /script\.js\?v=20260812-17/);
+  assert.match(html, /script\.js\?v=20260812-21/);
   assert.match(html, /"@type"\s*:\s*"Product"/);
   assert.match(html, /"offers"\s*:\s*\{[\s\S]*"@type"\s*:\s*"Offer"/);
   assert.match(html, /"priceCurrency"\s*:\s*"THB"/);
   assert.match(html, /"price"\s*:\s*"380"/);
   assert.match(html, /"availability"\s*:\s*"https:\/\/schema\.org\/InStock"/);
   assert.match(html, /"additionalProperty"\s*:\s*\[[\s\S]*"name"\s*:\s*"Tone-Up"[\s\S]*"name"\s*:\s*"Moisture"[\s\S]*"name"\s*:\s*"Primer"[\s\S]*"name"\s*:\s*"Whitening"/);
-  assert.match(html, /โปรพิเศษ[\s\S]*490 บาท[\s\S]*380 บาท/);
+  assert.match(html, /class="use-price"><span[^>]*>โปรพิเศษ<\/span> <del[^>]*>490 บาท<\/del> <strong[^>]*>เหลือ 380 บาท<\/strong>/);
   assert.match(html, /ครีมโทนอัพเกาหลี/);
   assert.doesNotMatch(html, /SPF\s*50/i);
 });
@@ -62,7 +62,7 @@ test('Section 2 copy stays attached to the product and is not reset on a same-se
   const js = await readFile(new URL('script.js', root), 'utf8');
 
   assert.match(js, /const productRect = anchors\[1\]\.getBoundingClientRect\(\);[\s\S]*visibleProductInset = 132;[\s\S]*rightPx = stageRect\.right - productRect\.left - visibleProductInset;[\s\S]*availableCopyWidth = Math\.max\(0, productRect\.left - stageRect\.left - 24\);[\s\S]*copyWidth = Math\.min\(window\.innerWidth \* 0\.41, 464, availableCopyWidth\)/);
-  assert.match(js, /const copyTop = productRect\.top - stageRect\.top - 12;[\s\S]*const copyLeft = productRect\.left - stageRect\.left \+ productRect\.width \/ 2;[\s\S]*yPercent: -100/);
+  assert.match(js, /const copyTop = Math\.max\(8, productRect\.top - stageRect\.top - 12\);[\s\S]*const copyLeft = productRect\.left - stageRect\.left \+ productRect\.width \/ 2;[\s\S]*yPercent: -100/);
   assert.match(js, /if \(visible === isCopyVisible\) return;/);
   assert.match(js, /const nextIndex = resolveActiveIndex\(\);[\s\S]*if \(nextIndex !== activeIndex\) settleProductAt\(nextIndex\);/);
 });
@@ -76,7 +76,29 @@ test('Section 2 ends with the four-in-one product benefit summary', async () => 
   assert.match(section2, /class="reveal-product-benefits"[\s\S]*4 คุณสมบัติในหนึ่งเดียว:.*Tone-Up · Moisture · Primer · Whitening/);
   assert.doesNotMatch(section4, /4 คุณสมบัติในหนึ่งเดียว/);
   assert.match(css, /\.reveal-product-benefits\s*\{[^}]*left:\s*50%;[^}]*text-align:\s*center;[^}]*transform:\s*translateX\(-50%\)/);
-  assert.match(css, /\.reveal-product-benefits\s*\{[^}]*bottom:\s*calc\(var\(--shared-product-width\) \+ 1rem\)[^}]*transform:\s*none/);
+  assert.match(css, /#reveal \.product-destination\s*\{\s*bottom:\s*3\.3rem;/);
+  assert.match(css, /\.reveal-product-benefits\s*\{[^}]*bottom:\s*\.8rem;[^}]*transform:\s*none/);
+  assert.match(css, /#reveal\.reveal-section\s*\{\s*height:\s*clamp\(29rem, calc\(72svh \+ 2rem\), 38rem\)/);
+});
+
+test('language switcher supplies Thai, English, and Korean content with a header order action', async () => {
+  const html = await readFile(new URL('index.html', root), 'utf8');
+  const js = await readFile(new URL('script.js', root), 'utf8');
+
+  assert.match(html, /class="header-order" href="https:\/\/lin\.ee\/sGY1qQP"/);
+  assert.match(html, /data-language="th">ไทย/);
+  assert.match(html, /data-language="en">English/);
+  assert.match(html, /data-language="ko">한국어/);
+  assert.match(js, /const translations = \{[\s\S]*en:\s*\{[\s\S]*ko:\s*\{/);
+  assert.match(js, /localStorage\.setItem\('wswss-language', language\)/);
+});
+
+test('English and Korean typography is compact enough for the existing responsive sections', async () => {
+  const css = await readFile(new URL('styles.css', root), 'utf8');
+
+  assert.match(css, /html\[data-language="en"\] \.use-cta-copy h2, html\[data-language="ko"\] \.use-cta-copy h2 \{ font-size: clamp\(1\.5rem, 2\.7vw, 2\.5rem\)/);
+  assert.match(css, /html\[data-language="en"\] \.info-slide strong, html\[data-language="ko"\] \.info-slide strong \{ font-size: clamp\(\.72rem, \.9vw, \.88rem\)/);
+  assert.match(css, /overflow-wrap: anywhere/);
 });
 
 test('approved sections and product assets remain present', async () => {

@@ -15,6 +15,9 @@ const translations = {
     slideFourLong: 'Long-lasting for 8+ hours', slideFourWater: 'Water- and sweat-resistant all day', slideFourCopy: 'Water-resistant for 8+ hours and easy to cleanse with regular facial wash or soap.',
     formulaLead: 'True beauty starts with the best foundation.', formulaDescription: 'Made in South Korea by PROYOU COSMETICS, with factory-standard documents available for review.', notificationLabel: 'Thai cosmetic notification number', notificationCopy: 'Product information is properly notified.', formulaAssurance: 'Manufacturer factory standards: ISO 22716 (Cosmetics GMP) · ISO 9001 (Quality Management) · ISO 14001 (Environmental Management)',
     useIntro: 'Apply before sunscreen for brighter-, smoother-looking skin, less visible pores, and makeup that stays beautiful without dullness.', orderWswss: 'ORDER WSWSS', productDetails: 'View product details', footerProduct: 'Product', footerFeatures: 'Features', footerStandards: 'Standards & Manufacturer', footerHow: 'How to use',
+    infoKicker: 'MOISTURE TONE-UP', infoOrigin: 'MOISTURE TONE-UP CREAM · MADE IN KOREA', manufacturerAddress: 'PROYOU COSMETICS CO., LTD. · 10, Gyeongsu-daero 391beon-gil, Uiwang-si, Gyeonggi-do, Republic of Korea · Business Registration No. 123-86-01534 · TEL +82-31-427-6181', documentsLabel: 'Factory standard documents',
+    useStepOne: 'Dispense', useStepTwo: 'Pat', useStepThree: 'Blend', useStepOneCopy: 'Dispense a pearl-sized amount of cream.', useStepTwoCopy: 'Gently pat across the face and neck to help the cream adhere.', useStepThreeCopy: 'Blend gently for a smooth, natural-looking finish.',
+    ctaTitleOne: 'Reveal your beauty', ctaTitleTwo: 'beyond what it was before.', ctaCopy: 'Bright, moisturized, smooth, and naturally healthy-looking skin.', ctaPriceLabel: 'Special offer', ctaPriceRegular: '490 THB', ctaPriceSale: 'Now 380 THB', lineQr: 'Add LINE for WSWSS news and special offers.',
   },
   ko: {
     navProduct: '제품', navReveal: '피부 표현', navWhy: 'WSWSS 특징', navStandards: '제조 기준', navHow: '사용 방법', headerOrder: '주문하기',
@@ -27,6 +30,9 @@ const translations = {
     slideFourLong: '8시간 이상 지속', slideFourWater: '하루 종일 물과 땀에 강함', slideFourCopy: '8시간 이상 워터 레지스턴스, 일반 클렌저나 비누로 쉽게 세안할 수 있습니다.',
     formulaLead: '진정한 아름다움은 좋은 기준에서 시작됩니다.', formulaDescription: '대한민국 PROYOU COSMETICS에서 제조하며, 제조 공장 표준 문서를 확인할 수 있습니다.', notificationLabel: '태국 화장품 등록번호', notificationCopy: '제품 정보가 적법하게 등록되었습니다.', formulaAssurance: '제조 공장 표준: ISO 22716 (Cosmetics GMP) · ISO 9001 (Quality Management) · ISO 14001 (Environmental Management)',
     useIntro: '자외선 차단제 전에 사용하세요. 피부가 더 밝고 매끈해 보이며 모공을 자연스럽게 커버해 메이크업이 오래도록 예쁘게 유지됩니다.', orderWswss: 'WSWSS 주문하기', productDetails: '제품 자세히 보기', footerProduct: '제품', footerFeatures: '특징', footerStandards: '제조 기준 및 제조사', footerHow: '사용 방법',
+    infoKicker: '수분 톤업', infoOrigin: '수분 톤업 크림 · MADE IN KOREA', manufacturerAddress: '㈜프로유화장품 · 경기도 의왕시 경수대로391번길 10 (오전동) · 사업자등록번호 123-86-01534 · TEL +82-31-427-6181', documentsLabel: '제조 공장 표준 문서',
+    useStepOne: '덜기', useStepTwo: '두드리기', useStepThree: '펴 바르기', useStepOneCopy: '진주알 크기만큼 적당량을 덜어냅니다.', useStepTwoCopy: '얼굴과 목에 부드럽게 두드려 밀착시켜 줍니다.', useStepThreeCopy: '자연스럽고 매끈한 피부 표현을 위해 부드럽게 펴 바릅니다.',
+    ctaTitleOne: '피부 본연의 아름다움을', ctaTitleTwo: '더 빛나게.', ctaCopy: '맑고 촉촉하며 매끈한, 자연스럽고 건강한 피부 표현.', ctaPriceLabel: '스페셜 프로모션', ctaPriceRegular: '490바트', ctaPriceSale: '380바트', lineQr: 'LINE을 추가하고 WSWSS 소식과 특별 혜택을 받아보세요.',
   },
 };
 
@@ -35,14 +41,16 @@ function setupLanguageSwitcher() {
   const menu = document.querySelector('.language-menu');
   const options = [...document.querySelectorAll('[data-language]')];
   if (!trigger || !menu || !options.length) return;
+  const originalText = new Map([...document.querySelectorAll('[data-i18n]')].map((element) => [element, element.textContent]));
 
   const applyLanguage = (language) => {
     const dictionary = translations[language] || {};
     document.querySelectorAll('[data-i18n]').forEach((element) => {
       const translation = dictionary[element.dataset.i18n];
-      if (translation) element.textContent = translation;
+      element.textContent = translation || originalText.get(element);
     });
     document.documentElement.lang = language === 'ko' ? 'ko' : language;
+    document.documentElement.dataset.language = language;
     trigger.childNodes[0].nodeValue = `${language.toUpperCase()} `;
     options.forEach((option) => option.setAttribute('aria-current', String(option.dataset.language === language)));
     localStorage.setItem('wswss-language', language);
@@ -224,7 +232,9 @@ function buildRevealTransition() {
         const stage = revealStage;
         const stageRect = stage.getBoundingClientRect();
         const productRect = anchors[1].getBoundingClientRect();
-        const copyTop = productRect.top - stageRect.top - 12;
+        // Keep the card within Section 2 even after the product is raised to
+        // make room for the benefit summary below it.
+        const copyTop = Math.max(8, productRect.top - stageRect.top - 12);
         const copyLeft = productRect.left - stageRect.left + productRect.width / 2;
 
         gsap.set(revealCopy, {

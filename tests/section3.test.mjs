@@ -15,6 +15,7 @@ test('Section 3 supplies four moisture information states and the Section 4–5 
   assert.match(html, /assets\/session3\/product02\.png/);
   assert.doesNotMatch(html, /assets\/session3\/product03\.png/);
   assert.match(html, /<section class="formula-section" id="section-4"/);
+  assert.doesNotMatch(html, /class="info-counter"/);
   assert.match(html, /<section class="use-section" id="section-5"/);
 });
 
