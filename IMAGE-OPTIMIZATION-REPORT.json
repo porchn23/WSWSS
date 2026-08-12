@@ -1,0 +1,125 @@
+{
+  "optimized_items": 14,
+  "before_bytes": 16238873,
+  "after_bytes": 2395466,
+  "saved_bytes": 13843407,
+  "saved_percent": 85.2,
+  "animation_critical_unchanged": [
+    "wswss-product-cutout.png",
+    "session3/WSWSS-PD001.png"
+  ],
+  "items": [
+    {
+      "source": "wswss-hero-set.png",
+      "optimized": "wswss-hero-set.webp",
+      "before": 1259300,
+      "after": 31270,
+      "saving": 1228030,
+      "kind": "WebP q90"
+    },
+    {
+      "source": "wswss-bg-section2.png",
+      "optimized": "wswss-bg-section2.webp",
+      "before": 2183479,
+      "after": 206250,
+      "saving": 1977229,
+      "kind": "WebP q90"
+    },
+    {
+      "source": "session3/bg.png",
+      "optimized": "session3/bg.webp",
+      "before": 1271508,
+      "after": 24856,
+      "saving": 1246652,
+      "kind": "WebP q88"
+    },
+    {
+      "source": "session3/product02.png",
+      "optimized": "session3/product02.webp",
+      "before": 1458232,
+      "after": 132696,
+      "saving": 1325536,
+      "kind": "WebP q92"
+    },
+    {
+      "source": "section5/use001.png",
+      "optimized": "section5/use001.webp",
+      "before": 2085296,
+      "after": 147170,
+      "saving": 1938126,
+      "kind": "WebP q90"
+    },
+    {
+      "source": "section5/use002.png",
+      "optimized": "section5/use002.webp",
+      "before": 1984472,
+      "after": 127830,
+      "saving": 1856642,
+      "kind": "WebP q90"
+    },
+    {
+      "source": "section5/use003.png",
+      "optimized": "section5/use003.webp",
+      "before": 2045466,
+      "after": 131482,
+      "saving": 1913984,
+      "kind": "WebP q90"
+    },
+    {
+      "source": "section5/S5BG.png",
+      "optimized": "section5/S5BG.webp",
+      "before": 1300608,
+      "after": 26004,
+      "saving": 1274604,
+      "kind": "WebP q88"
+    },
+    {
+      "source": "section4/iso22716.png",
+      "optimized": "section4/iso22716.webp",
+      "before": 526538,
+      "after": 326402,
+      "saving": 200136,
+      "kind": "WebP lossless"
+    },
+    {
+      "source": "section4/iso9001.png",
+      "optimized": "section4/iso9001.webp",
+      "before": 702482,
+      "after": 465826,
+      "saving": 236656,
+      "kind": "WebP lossless"
+    },
+    {
+      "source": "section4/iso14001.png",
+      "optimized": "section4/iso14001.webp",
+      "before": 681860,
+      "after": 491046,
+      "saving": 190814,
+      "kind": "WebP lossless"
+    },
+    {
+      "source": "wswss-share-th.jpg",
+      "optimized": "wswss-share-th.jpg",
+      "before": 251541,
+      "after": 97727,
+      "saving": 153814,
+      "kind": "JPEG q88"
+    },
+    {
+      "source": "wswss-share-en.jpg",
+      "optimized": "wswss-share-en.jpg",
+      "before": 251193,
+      "after": 96119,
+      "saving": 155074,
+      "kind": "JPEG q88"
+    },
+    {
+      "source": "wswss-share-ko.jpg",
+      "optimized": "wswss-share-ko.jpg",
+      "before": 236898,
+      "after": 90788,
+      "saving": 146110,
+      "kind": "JPEG q88"
+    }
+  ]
+}
