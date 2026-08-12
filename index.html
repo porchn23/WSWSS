@@ -34,10 +34,12 @@
     <link rel="alternate" hreflang="en" href="https://www.wswss.com/en/" />
     <link rel="alternate" hreflang="ko" href="https://www.wswss.com/ko/" />
     <link rel="alternate" hreflang="x-default" href="https://www.wswss.com/" />
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+    <link rel="preload" as="image" href="assets/wswss-hero-set.png" fetchpriority="high" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500&family=Noto+Sans+KR:wght@300;400;500;600&family=Noto+Sans+Thai:wght@300;400;500;600&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="styles.css?v=20260812-58" />
+    <link rel="stylesheet" href="styles.css?v=20260812-59" />
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -101,7 +103,7 @@
   <body>
     <main>
       <section class="hero" id="product" aria-labelledby="hero-title">
-        <img class="hero-scene" src="assets/wswss-hero-set.png" alt="" aria-hidden="true" />
+        <img class="hero-scene" src="assets/wswss-hero-set.png" width="2023" height="777" loading="eager" fetchpriority="high" alt="" aria-hidden="true" />
 
         <header class="site-header">
           <a class="brand-lockup" href="#product" aria-label="WSWSS home">
@@ -153,7 +155,7 @@
           </div>
 
           <figure class="product-shot" data-product-anchor aria-label="พรพรร Bright Tone-Up Moisture Cream">
-            <img src="assets/wswss-product-cutout.png" alt="พรพรร Bright Tone-Up Moisture Cream" />
+            <img src="assets/wswss-product-cutout.png" loading="eager" fetchpriority="high" alt="พรพรร Bright Tone-Up Moisture Cream" />
           </figure>
         </div>
 
@@ -190,6 +192,8 @@
           <img
             class="reveal-face"
             src="assets/wswss-bg-section2.png"
+            loading="lazy"
+            decoding="async"
             alt="ผิวจริงที่ยังคงรายละเอียดและความเป็นธรรมชาติ"
           />
           <div class="reveal-copy">
@@ -218,8 +222,8 @@
 
           <figure class="product-destination" data-product-anchor aria-hidden="true">
             <span class="product-stack">
-              <img class="product-image is-active" data-product-variant="standard" src="assets/wswss-product-cutout.png" alt="" />
-              <img class="product-image product-image--section3" data-product-variant="section3" src="assets/session3/WSWSS-PD001.png?v=20260811-02" alt="" />
+              <img class="product-image is-active" data-product-variant="standard" src="assets/wswss-product-cutout.png" loading="lazy" decoding="async" fetchpriority="low" alt="" />
+              <img class="product-image product-image--section3" data-product-variant="section3" src="assets/session3/WSWSS-PD001.png?v=20260811-02" loading="lazy" decoding="async" fetchpriority="low" alt="" />
             </span>
           </figure>
           <p class="reveal-product-benefits" data-i18n="fourBenefits">4 คุณสมบัติในหนึ่งเดียว: Tone-Up · Moisture · Primer · Whitening — ช่วยให้ผิวดูกระจ่างใส ชุ่มชื้น เรียบเนียน และพร้อมสำหรับเมคอัพ</p>
@@ -228,7 +232,7 @@
 
       <section class="info-section" id="section-3" aria-labelledby="section-3-title">
         <div class="info-stage">
-          <img class="info-bg" src="assets/session3/bg.png" alt="" aria-hidden="true" />
+          <img class="info-bg" src="assets/session3/bg.png" loading="lazy" decoding="async" fetchpriority="low" alt="" aria-hidden="true" />
 
           <div class="info-content">
             <p class="info-kicker" data-i18n="infoKicker">수분 톤업</p>
@@ -272,10 +276,10 @@
           </div>
 
           <figure class="product-destination info-product" data-product-anchor aria-hidden="true">
-            <img class="info-cream info-cream--dollop" src="assets/session3/product02.png" alt="" />
+            <img class="info-cream info-cream--dollop" src="assets/session3/product02.png" loading="lazy" decoding="async" fetchpriority="low" alt="" />
             <span class="product-stack">
-              <img class="product-image" data-product-variant="standard" src="assets/wswss-product-cutout.png" alt="" />
-              <img class="product-image product-image--section3" data-product-variant="section3" src="assets/session3/WSWSS-PD001.png?v=20260811-02" alt="" />
+              <img class="product-image" data-product-variant="standard" src="assets/wswss-product-cutout.png" loading="lazy" decoding="async" fetchpriority="low" alt="" />
+              <img class="product-image product-image--section3" data-product-variant="section3" src="assets/session3/WSWSS-PD001.png?v=20260811-02" loading="lazy" decoding="async" fetchpriority="low" alt="" />
             </span>
           </figure>
         </div>
@@ -311,19 +315,19 @@
 
             <div class="document-rail" aria-label="Documents and certificates">
               <div class="document-rail-intro"><strong>DOCUMENTS &amp; CERTIFICATES</strong><span data-i18n="documentsLabel">เอกสารรับรองมาตรฐาน</span></div>
-              <figure class="document-card" role="button" tabindex="0"><img src="assets/section4/iso22716.png" alt="ISO 22716 certificate" /><figcaption>ISO 22716<br />CERTIFICATE</figcaption></figure>
-              <figure class="document-card" role="button" tabindex="0"><img src="assets/section4/iso9001.png" alt="ISO 9001 certificate" /><figcaption>ISO 9001<br />CERTIFICATE</figcaption></figure>
-              <figure class="document-card" role="button" tabindex="0"><img src="assets/section4/iso14001.png" alt="ISO 14001 certificate" /><figcaption>ISO 14001<br />CERTIFICATE</figcaption></figure>
-              <figure class="document-card" role="button" tabindex="0"><img src="assets/section4/IMG_1249.jpg" alt="Certificate of Free Sale document" /><figcaption>CERTIFICATE<br />OF FREE SALE</figcaption></figure>
-              <figure class="document-card" role="button" tabindex="0"><img src="assets/section4/IMG_1250.jpg" alt="Import certificate document" /><figcaption>IMPORT<br />CERTIFICATE</figcaption></figure>
-              <figure class="document-card" role="button" tabindex="0"><img src="assets/section4/IMG_1251.jpg" alt="FDA notification document" /><figcaption>FDA<br />NOTIFICATION</figcaption></figure>
-              <figure class="document-card" role="button" tabindex="0"><img src="assets/section4/IMG_1252.jpg" alt="Additional product document" /><figcaption>PRODUCT<br />DOCUMENT</figcaption></figure>
+              <figure class="document-card" role="button" tabindex="0"><img src="assets/section4/iso22716.png" loading="lazy" decoding="async" fetchpriority="low" alt="ISO 22716 certificate" /><figcaption>ISO 22716<br />CERTIFICATE</figcaption></figure>
+              <figure class="document-card" role="button" tabindex="0"><img src="assets/section4/iso9001.png" loading="lazy" decoding="async" fetchpriority="low" alt="ISO 9001 certificate" /><figcaption>ISO 9001<br />CERTIFICATE</figcaption></figure>
+              <figure class="document-card" role="button" tabindex="0"><img src="assets/section4/iso14001.png" loading="lazy" decoding="async" fetchpriority="low" alt="ISO 14001 certificate" /><figcaption>ISO 14001<br />CERTIFICATE</figcaption></figure>
+              <figure class="document-card" role="button" tabindex="0"><img src="assets/section4/IMG_1249.jpg" loading="lazy" decoding="async" fetchpriority="low" alt="Certificate of Free Sale document" /><figcaption>CERTIFICATE<br />OF FREE SALE</figcaption></figure>
+              <figure class="document-card" role="button" tabindex="0"><img src="assets/section4/IMG_1250.jpg" loading="lazy" decoding="async" fetchpriority="low" alt="Import certificate document" /><figcaption>IMPORT<br />CERTIFICATE</figcaption></figure>
+              <figure class="document-card" role="button" tabindex="0"><img src="assets/section4/IMG_1251.jpg" loading="lazy" decoding="async" fetchpriority="low" alt="FDA notification document" /><figcaption>FDA<br />NOTIFICATION</figcaption></figure>
+              <figure class="document-card" role="button" tabindex="0"><img src="assets/section4/IMG_1252.jpg" loading="lazy" decoding="async" fetchpriority="low" alt="Additional product document" /><figcaption>PRODUCT<br />DOCUMENT</figcaption></figure>
             </div>
             <p class="formula-assurance" data-i18n="formulaAssurance">มาตรฐานของโรงงานผู้ผลิต: ISO 22716 (Cosmetics GMP) · ISO 9001 (Quality Management) · ISO 14001 (Environmental Management)</p>
           </div>
 
           <figure class="product-destination formula-product" data-product-anchor aria-hidden="true">
-            <span class="product-stack"><img class="product-image is-active" data-product-variant="standard" src="assets/wswss-product-cutout.png" alt="" /></span>
+            <span class="product-stack"><img class="product-image is-active" data-product-variant="standard" src="assets/wswss-product-cutout.png" loading="lazy" decoding="async" fetchpriority="low" alt="" /></span>
           </figure>
         </div>
       </section>
@@ -335,9 +339,9 @@
             <h2 id="section-5-title"><span data-i18n="useStepOne">หยด</span> <i>·</i> <span data-i18n="useStepTwo">ตบ</span> <i>·</i> <span data-i18n="useStepThree">เกลี่ย</span></h2>
             <p class="use-intro" data-i18n="useIntro">ลงก่อนกันแดด ผิวดูใสขึ้น เรียบเนียนขึ้น รูขุมขนดูเล็กลง เมคอัพสวยไม่ดรอป</p>
             <div class="use-steps" aria-label="How to use WSWSS">
-              <article class="use-step"><span class="use-number">01</span><img class="use-art" src="assets/section5/use001.png" alt="" /><h3 data-i18n="useStepOne">หยด</h3><p data-i18n="useStepOneCopy">หยดครีมในปริมาณพอเหมาะ ประมาณเมล็ดไข่มุก</p></article>
-              <article class="use-step"><span class="use-number">02</span><img class="use-art" src="assets/section5/use002.png" alt="" /><h3 data-i18n="useStepTwo">ตบ</h3><p data-i18n="useStepTwoCopy">ตบเบา ๆ ทั่วใบหน้าและลำคอ เพื่อช่วยให้เนื้อครีมแนบผิว</p></article>
-              <article class="use-step"><span class="use-number">03</span><img class="use-art" src="assets/section5/use003.png" alt="" /><h3 data-i18n="useStepThree">เกลี่ย</h3><p data-i18n="useStepThreeCopy">เกลี่ยเบา ๆ ให้เรียบเนียน ไปกับผิวอย่างเป็นธรรมชาติ</p></article>
+              <article class="use-step"><span class="use-number">01</span><img class="use-art" src="assets/section5/use001.png" loading="lazy" decoding="async" fetchpriority="low" alt="" /><h3 data-i18n="useStepOne">หยด</h3><p data-i18n="useStepOneCopy">หยดครีมในปริมาณพอเหมาะ ประมาณเมล็ดไข่มุก</p></article>
+              <article class="use-step"><span class="use-number">02</span><img class="use-art" src="assets/section5/use002.png" loading="lazy" decoding="async" fetchpriority="low" alt="" /><h3 data-i18n="useStepTwo">ตบ</h3><p data-i18n="useStepTwoCopy">ตบเบา ๆ ทั่วใบหน้าและลำคอ เพื่อช่วยให้เนื้อครีมแนบผิว</p></article>
+              <article class="use-step"><span class="use-number">03</span><img class="use-art" src="assets/section5/use003.png" loading="lazy" decoding="async" fetchpriority="low" alt="" /><h3 data-i18n="useStepThree">เกลี่ย</h3><p data-i18n="useStepThreeCopy">เกลี่ยเบา ๆ ให้เรียบเนียน ไปกับผิวอย่างเป็นธรรมชาติ</p></article>
             </div>
           </div>
         </div>
@@ -349,14 +353,14 @@
             <p class="use-price"><span data-i18n="ctaPriceLabel">โปรพิเศษ</span> <del data-i18n="ctaPriceRegular">490 บาท</del> <strong data-i18n="ctaPriceSale">เหลือ 380 บาท</strong></p>
             <div class="use-actions"><a class="use-order" href="https://lin.ee/sGY1qQP" target="_blank" rel="noopener noreferrer" data-i18n="orderWswss">สั่งซื้อ WSWSS</a><a class="use-details" href="#section-3" data-i18n="productDetails">ดูรายละเอียดผลิตภัณฑ์</a></div>
             <div class="use-meta"><span>50g</span><span>Made in Korea</span><span>All Skin Types</span><span>PRO YOU COSMETICS CO., LTD.</span></div>
-            <div class="use-line-qr"><img src="assets/section5/L_gainfriends_2dbarcodes_GW.png" alt="QR Code LINE WSWSS" /><span data-i18n="lineQr">แอด LINE เพื่อรับข่าวสารและสิทธิพิเศษจาก WSWSS</span></div>
+            <div class="use-line-qr"><img src="assets/section5/L_gainfriends_2dbarcodes_GW.png" loading="lazy" decoding="async" fetchpriority="low" alt="QR Code LINE WSWSS" /><span data-i18n="lineQr">แอด LINE เพื่อรับข่าวสารและสิทธิพิเศษจาก WSWSS</span></div>
           </div>
-          <figure class="product-destination use-product" data-product-anchor aria-hidden="true"><span class="product-stack"><img class="product-image is-active" data-product-variant="standard" src="assets/wswss-product-cutout.png" alt="" /></span></figure>
+          <figure class="product-destination use-product" data-product-anchor aria-hidden="true"><span class="product-stack"><img class="product-image is-active" data-product-variant="standard" src="assets/wswss-product-cutout.png" loading="lazy" decoding="async" fetchpriority="low" alt="" /></span></figure>
         </div>
       </section>
 
       <footer class="site-footer">
-        <a class="footer-brand" href="#product"><img src="assets/wswss-logo.png" alt="WSWSS" /></a>
+        <a class="footer-brand" href="#product"><img src="assets/wswss-logo.png" loading="lazy" decoding="async" fetchpriority="low" alt="WSWSS" /></a>
         <nav class="footer-nav" aria-label="Footer navigation"><a href="#product" data-i18n="footerProduct">ผลิตภัณฑ์</a><a href="#section-3" data-i18n="footerFeatures">คุณสมบัติ</a><a href="#section-4" data-i18n="footerStandards">มาตรฐานและผู้ผลิต</a><a href="#section-5" data-i18n="footerHow">วิธีใช้</a></nav>
         <p>© <span id="copyright-year">2026</span> WSWSS by PAEDSAEN PRODUCTION. All rights reserved.</p>
         <div class="footer-legal" aria-label="Legal information"><span>Privacy Policy</span><span>Terms of Service</span></div>
@@ -364,8 +368,8 @@
 
       <figure class="product-traveler" aria-hidden="true">
         <span class="product-stack">
-          <img class="product-image is-active" data-product-variant="standard" src="assets/wswss-product-cutout.png" alt="" />
-          <img class="product-image product-image--section3" data-product-variant="section3" src="assets/session3/WSWSS-PD001.png?v=20260811-02" alt="" />
+          <img class="product-image is-active" data-product-variant="standard" src="assets/wswss-product-cutout.png" loading="lazy" decoding="async" fetchpriority="low" alt="" />
+          <img class="product-image product-image--section3" data-product-variant="section3" src="assets/session3/WSWSS-PD001.png?v=20260811-02" loading="lazy" decoding="async" fetchpriority="low" alt="" />
         </span>
       </figure>
     </main>
@@ -378,8 +382,8 @@
       </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
-    <script src="script.js?v=20260812-32"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+    <script defer src="script.js?v=20260812-33"></script>
   </body>
 </html>

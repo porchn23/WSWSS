@@ -115,14 +115,14 @@ function buildHeroTimeline() {
 
   return gsap.timeline({ defaults: { ease: 'power2.out' } })
     .from('.site-header', { y: -10, opacity: 0, duration: 0.4 })
-    .from('.hero-title > span', { yPercent: 12, opacity: 0, stagger: 0.04, duration: 0.48 }, '-=0.24')
-    .from('.product-shot', { yPercent: 5, opacity: 0, duration: 0.56 }, '-=0.42')
+    .from('.hero-title > span', { yPercent: 12, stagger: 0.04, duration: 0.48 }, '-=0.24')
+    .from('.product-shot', { yPercent: 5, duration: 0.56 }, '-=0.42')
     .add(() => document.querySelector('.product-shot').classList.add('is-visible'), '-=0.1')
     .to('.pen-path', { strokeDashoffset: 0, duration: 0.46, ease: 'none' }, '-=0.28')
     .to('.signature-path', { strokeDashoffset: 0, duration: 0.2, ease: 'none' }, '-=0.1')
     .to('.signature-text', { opacity: 1, x: 0, duration: 0.26, ease: 'power1.out' }, '-=0.1')
     .to('.signature-tail', { strokeDashoffset: 0, duration: 0.18, ease: 'none' }, '-=0.16')
-    .from(['.brand-belief', '.story-button'], { y: 8, opacity: 0, stagger: 0.05, duration: 0.34 }, '-=0.38')
+    .from(['.brand-belief', '.story-button'], { y: 8, stagger: 0.05, duration: 0.34 }, '-=0.38')
     .from('.feature-item', { y: 6, opacity: 0, stagger: 0.025, duration: 0.26 }, '-=0.22');
 }
 

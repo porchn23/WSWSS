@@ -117,6 +117,7 @@ button {
   overflow: hidden;
   background: #fff;
   isolation: isolate;
+  contain: layout paint;
 }
 
 .hero-scene {
@@ -129,6 +130,7 @@ button {
   object-position: center;
   filter: blur(3px);
   transform: scale(1.015);
+  backface-visibility: hidden;
 }
 
 .site-header {

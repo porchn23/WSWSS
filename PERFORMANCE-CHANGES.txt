@@ -1,0 +1,19 @@
+WSWSS Performance Optimization
+
+Changes made:
+- Preload the main hero image (wswss-hero-set.png) with fetchpriority=high.
+- Mark hero image and above-the-fold product image as eager.
+- Add intrinsic width/height to the hero image to help browser scheduling/layout.
+- Lazy-load below-the-fold imagery and set fetchpriority=low to reduce competition with LCP.
+- Defer GSAP, ScrollTrigger, and site script while preserving script order.
+- Keep hero title/product visible at first paint; GSAP now animates movement without hiding likely LCP elements.
+- Add preconnect for cdn.jsdelivr.net.
+- Preserve the existing hero blur/design.
+- Keep all existing SEO/schema/content intact.
+
+Deploy:
+Replace the current index.html, styles.css, and script.js with these files.
+Assets paths are unchanged.
+
+Important:
+If LCP remains high after deployment, the next step is to compress/convert assets/wswss-hero-set.png (and possibly wswss-product-cutout.png) to AVIF/WebP using the actual asset files.
