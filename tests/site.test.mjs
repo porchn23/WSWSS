@@ -28,7 +28,7 @@ test('SEO and AI discovery metadata describe the approved product without SPF cl
   assert.match(html, /rel="manifest"[^>]*assets\/favicon_io\/site\.webmanifest/i);
   assert.match(html, /application\/ld\+json/);
   assert.match(html, /styles\.css\?v=20260812-58/);
-  assert.match(html, /script\.js\?v=20260812-21/);
+  assert.match(html, /script\.js\?v=20260812-23/);
   assert.match(html, /"@type"\s*:\s*"Product"/);
   assert.match(html, /"offers"\s*:\s*\{[\s\S]*"@type"\s*:\s*"Offer"/);
   assert.match(html, /"priceCurrency"\s*:\s*"THB"/);
@@ -65,6 +65,12 @@ test('Section 2 copy stays attached to the product and is not reset on a same-se
   assert.match(js, /const copyTop = Math\.max\(8, productRect\.top - stageRect\.top - 12\);[\s\S]*const copyLeft = productRect\.left - stageRect\.left \+ productRect\.width \/ 2;[\s\S]*yPercent: -100/);
   assert.match(js, /if \(visible === isCopyVisible\) return;/);
   assert.match(js, /const nextIndex = resolveActiveIndex\(\);[\s\S]*if \(nextIndex !== activeIndex\) settleProductAt\(nextIndex\);/);
+  assert.match(js, /duration:\s*0\.42,[\s\S]*ease:\s*'power2\.out'/);
+  assert.doesNotMatch(js, /back\.out\(1\.25\)/);
+  assert.doesNotMatch(js, /const blur = gsap\.utils\.interpolate\(0, 6/);
+  assert.match(js, /onEnterBack: \(\) => \{ if \(triggersReady\) moveProductTo\(anchorIndex - 1\); \}/);
+  assert.match(js, /ScrollTrigger\.addEventListener\('scrollEnd',[\s\S]*if \(nextIndex !== activeIndex\) settleProductAt\(nextIndex\);/);
+  assert.match(js, /window\.addEventListener\('scroll',[\s\S]*window\.requestAnimationFrame\(\(\) => \{[\s\S]*if \(nextIndex !== activeIndex\) moveProductTo\(nextIndex\);/);
 });
 
 test('Section 2 ends with the four-in-one product benefit summary', async () => {

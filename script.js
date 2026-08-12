@@ -185,6 +185,7 @@ function buildRevealTransition() {
   let journeyTween = null;
   let triggersReady = false;
   let resizeFrame = 0;
+  let scrollFrame = 0;
   let isCopyVisible = false;
 
   gsap.set(revealCopy, { autoAlpha: 0, scale: 0.985 });
@@ -308,7 +309,8 @@ function buildRevealTransition() {
       width: currentRect.width,
     });
     setProductVariant(traveler, useTargetFromStart ? targetVariant : sourceVariant);
-    // Start sharp so there is no pop from the anchor to the traveler.
+    // Start sharp and stay sharp: animating CSS blur every frame is expensive
+    // on mobile GPUs and was a source of stutter during scroll transitions.
     const startingProduct = getActiveProductImage(traveler);
     gsap.set(startingProduct, {
       filter: productImageFilter(startingProduct),
@@ -323,8 +325,8 @@ function buildRevealTransition() {
 
     journeyTween = gsap.to(travelState, {
       progress: 1,
-      duration: 0.72,
-      ease: 'back.out(1.25)',
+      duration: 0.42,
+      ease: 'power2.out',
       overwrite: true,
       onUpdate: () => {
         const liveTarget = anchors[activeIndex].getBoundingClientRect();
@@ -341,15 +343,10 @@ function buildRevealTransition() {
           productSwapped = true;
         }
 
-        // Blur swells mid-journey and returns to sharp on arrival (sine curve),
-        // so the product starts and ends crisp with no visible pop.
-        const swell = Math.sin(travelState.progress * Math.PI);
-        const blur = gsap.utils.interpolate(0, 6, swell);
-        const opacity = gsap.utils.interpolate(1, 0.55, swell);
         const movingProduct = getActiveProductImage(traveler);
         gsap.set(movingProduct, {
-          filter: productImageFilter(movingProduct, blur),
-          opacity,
+          filter: productImageFilter(movingProduct),
+          opacity: 1,
         });
       },
       onComplete: () => {
@@ -405,22 +402,30 @@ function buildRevealTransition() {
 
     ScrollTrigger.create({
       trigger: section,
-      start: 'top 25%',
+      start: 'top 28%',
       invalidateOnRefresh: true,
-      onEnter: () => {
-        if (triggersReady) moveProductTo(anchorIndex);
-      },
-    });
-
-    ScrollTrigger.create({
-      trigger: section,
-      start: 'top 32%',
-      invalidateOnRefresh: true,
-      onLeaveBack: () => {
-        if (triggersReady) moveProductTo(anchorIndex - 1);
-      },
+      onEnter: () => { if (triggersReady) moveProductTo(anchorIndex); },
+      onEnterBack: () => { if (triggersReady) moveProductTo(anchorIndex - 1); },
     });
   });
+
+  ScrollTrigger.addEventListener('scrollEnd', () => {
+    if (!triggersReady || journeyTween) return;
+    const nextIndex = resolveActiveIndex();
+    if (nextIndex !== activeIndex) settleProductAt(nextIndex);
+  });
+
+  // ScrollTrigger callbacks can be skipped when a touch scroll crosses more
+  // than one section in a single frame. Reconcile against the actual viewport
+  // on every scroll frame so the product never remains in the prior section.
+  window.addEventListener('scroll', () => {
+    if (!triggersReady) return;
+    window.cancelAnimationFrame(scrollFrame);
+    scrollFrame = window.requestAnimationFrame(() => {
+      const nextIndex = resolveActiveIndex();
+      if (nextIndex !== activeIndex) moveProductTo(nextIndex);
+    });
+  }, { passive: true });
 
   ScrollTrigger.addEventListener('refreshInit', syncAnchorSizes);
   ScrollTrigger.addEventListener('refresh', () => {
