@@ -32,13 +32,12 @@ test('Section 3 interaction selects four information states and swaps product ar
   assert.doesNotMatch(js, /pin: stage/);
 });
 
-test('Section 3 switches to its dedicated artwork at the start of its handoff', async () => {
+test('Section 3 switches to its dedicated artwork midway through the travelling handoff', async () => {
   const js = await readFile(new URL('script.js', root), 'utf8');
 
-  assert.match(js, /const sourceVariant = productVariantForIndex\(activeIndex\);/);
-  assert.match(js, /const useTargetFromStart = targetVariant === 'section3';/);
-  assert.match(js, /setProductVariant\(traveler, useTargetFromStart \? targetVariant : sourceVariant\);/);
-  assert.match(js, /let productSwapped = useTargetFromStart \|\| sourceVariant === targetVariant;/);
+  assert.match(js, /const targetVariant = productVariantForIndex\(nextIndex\);/);
+  assert.match(js, /setProductVariant\(traveler, sourceVariant, true\);/);
+  assert.match(js, /progress >= 0\.5[\s\S]*setProductVariant\(traveler, targetVariant, true\);/);
 });
 
 test('cream artwork is taken out of product layout flow', async () => {

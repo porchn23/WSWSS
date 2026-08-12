@@ -46,11 +46,18 @@ function setupLanguageSwitcher() {
   if (staticLanguage) {
     trigger.childNodes[0].nodeValue = `${staticLanguage.toUpperCase()} `;
     options.forEach((option) => option.setAttribute('aria-current', String(option.dataset.language === staticLanguage)));
-    trigger.addEventListener('click', () => {
+    trigger.addEventListener('click', (event) => {
+      event.preventDefault();
+      event.stopPropagation();
       const isOpen = !menu.hidden;
       menu.hidden = isOpen;
       trigger.setAttribute('aria-expanded', String(!isOpen));
     });
+    options.forEach((option) => option.addEventListener('click', (event) => {
+      event.stopPropagation();
+      menu.hidden = true;
+      trigger.setAttribute('aria-expanded', 'false');
+    }));
     document.addEventListener('click', (event) => {
       if (!event.target.closest('.language-switcher')) {
         menu.hidden = true;
@@ -203,7 +210,6 @@ function buildRevealTransition() {
   let journeyTween = null;
   let triggersReady = false;
   let resizeFrame = 0;
-  let scrollFrame = 0;
   let isCopyVisible = false;
 
   gsap.set(revealCopy, { autoAlpha: 0, scale: 0.985 });
@@ -305,76 +311,115 @@ function buildRevealTransition() {
 
   function moveProductTo(nextIndex) {
     if (nextIndex < 0 || nextIndex >= anchors.length) return;
-    if (nextIndex === activeIndex && !journeyTween) return;
+    if (nextIndex === activeIndex) return;
 
-    if (journeyTween) journeyTween.kill();
+    let currentPosition;
+    let startingOpacity = 1;
+    let sourceVariant = productVariantForIndex(activeIndex);
+    if (journeyTween) {
+      // Retarget from the product's exact current document position. Fast
+      // scrolling across multiple sections therefore produces one direct move
+      // to the latest section, not a delayed chain through stale destinations.
+      const travelerStyle = getComputedStyle(traveler);
+      currentPosition = {
+        left: Number.parseFloat(travelerStyle.left),
+        top: Number.parseFloat(travelerStyle.top),
+        width: Number.parseFloat(travelerStyle.width),
+      };
+      startingOpacity = Number.parseFloat(travelerStyle.opacity);
+      sourceVariant = getActiveProductImage(traveler)?.dataset.productVariant || sourceVariant;
+      journeyTween.kill();
+      journeyTween = null;
+    }
 
-    const sourceVariant = productVariantForIndex(activeIndex);
     const targetVariant = productVariantForIndex(nextIndex);
-    const useTargetFromStart = targetVariant === 'section3';
-    const travelerIsVisible = getComputedStyle(traveler).display !== 'none';
-    const currentRect = travelerIsVisible
-      ? traveler.getBoundingClientRect()
-      : anchors[activeIndex].getBoundingClientRect();
+    const sourceRect = anchors[activeIndex].getBoundingClientRect();
 
     syncAnchorSizes();
-
+    const targetRect = anchors[nextIndex].getBoundingClientRect();
+    currentPosition ??= {
+      left: sourceRect.left + window.scrollX,
+      top: sourceRect.top + window.scrollY,
+      width: sourceRect.width,
+    };
+    const targetPosition = {
+      left: targetRect.left + window.scrollX,
+      top: targetRect.top + window.scrollY,
+      width: targetRect.width,
+    };
+    gsap.killTweensOf(anchors);
     gsap.set(anchors, { autoAlpha: 0 });
     gsap.set(traveler, {
       display: 'block',
-      left: currentRect.left,
-      top: currentRect.top,
-      width: currentRect.width,
+      left: currentPosition.left,
+      top: currentPosition.top,
+      width: currentPosition.width,
+      opacity: startingOpacity,
     });
-    setProductVariant(traveler, useTargetFromStart ? targetVariant : sourceVariant);
-    // Start sharp and stay sharp: animating CSS blur every frame is expensive
-    // on mobile GPUs and was a source of stutter during scroll transitions.
-    const startingProduct = getActiveProductImage(traveler);
-    gsap.set(startingProduct, {
-      filter: productImageFilter(startingProduct),
-      opacity: 1,
-    });
-
+    setProductVariant(traveler, sourceVariant, true);
     activeIndex = nextIndex;
     setCopyVisible(false);
 
+    // Both endpoints use document coordinates. The product therefore scrolls
+    // with the page while travelling instead of chasing a moving viewport
+    // target and jumping across sections.
     const travelState = { progress: 0 };
-    let productSwapped = useTargetFromStart || sourceVariant === targetVariant;
+    let productSwapped = sourceVariant === targetVariant;
+    const travelDistance = Math.hypot(
+      targetPosition.left - currentPosition.left,
+      targetPosition.top - currentPosition.top,
+    );
+    const arcHeight = Math.min(64, Math.max(24, travelDistance * 0.045));
+    const arrivalPoint = 0.82;
+    const overshootDistance = Math.min(22, Math.max(10, travelDistance * 0.025));
+    const directionX = travelDistance ? (targetPosition.left - currentPosition.left) / travelDistance : 0;
+    const directionY = travelDistance ? (targetPosition.top - currentPosition.top) / travelDistance : 0;
+    const overshootPosition = {
+      left: targetPosition.left + directionX * overshootDistance,
+      top: targetPosition.top + directionY * overshootDistance,
+    };
 
     journeyTween = gsap.to(travelState, {
       progress: 1,
-      duration: 0.42,
-      ease: 'power2.out',
+      duration: 0.68,
+      ease: 'power1.inOut',
       overwrite: true,
       onUpdate: () => {
-        const liveTarget = anchors[activeIndex].getBoundingClientRect();
+        const progress = travelState.progress;
+        const arriving = progress < arrivalPoint;
+        const motionProgress = arriving
+          ? progress / arrivalPoint
+          : (progress - arrivalPoint) / (1 - arrivalPoint);
+        const left = arriving
+          ? gsap.utils.interpolate(currentPosition.left, overshootPosition.left, motionProgress)
+          : gsap.utils.interpolate(overshootPosition.left, targetPosition.left, motionProgress);
+        const top = arriving
+          ? gsap.utils.interpolate(currentPosition.top, overshootPosition.top, motionProgress)
+          : gsap.utils.interpolate(overshootPosition.top, targetPosition.top, motionProgress);
+        const lift = arriving ? Math.sin(Math.PI * motionProgress) * arcHeight : 0;
+        const sizeProgress = Math.min(progress / arrivalPoint, 1);
+        const fadeOpacity = progress < 0.5
+          ? gsap.utils.interpolate(startingOpacity, 0, progress / 0.5)
+          : gsap.utils.interpolate(0, 1, (progress - 0.5) / 0.5);
         gsap.set(traveler, {
-          left: gsap.utils.interpolate(currentRect.left, liveTarget.left, travelState.progress),
-          top: gsap.utils.interpolate(currentRect.top, liveTarget.top, travelState.progress),
-          width: gsap.utils.interpolate(currentRect.width, liveTarget.width, travelState.progress),
+          left,
+          top: top - lift,
+          width: gsap.utils.interpolate(currentPosition.width, targetPosition.width, sizeProgress),
+          opacity: fadeOpacity,
         });
-
-        if (!productSwapped && travelState.progress >= 0.46) {
-          // The art changes while the shared product is at peak blur/low opacity,
-          // avoiding a visible cut between two different product cutouts.
-          setProductVariant(traveler, targetVariant);
+        if (!productSwapped && progress >= 0.5) {
+          setProductVariant(traveler, targetVariant, true);
           productSwapped = true;
         }
-
-        const movingProduct = getActiveProductImage(traveler);
-        gsap.set(movingProduct, {
-          filter: productImageFilter(movingProduct),
-          opacity: 1,
-        });
       },
       onComplete: () => {
-        gsap.set(traveler, { display: 'none' });
+        gsap.set(traveler, { display: 'none', opacity: 1 });
         gsap.set(anchors, { autoAlpha: 0 });
         setProductVariant(anchors[activeIndex], productVariantForIndex(activeIndex), true);
         gsap.set(anchors[activeIndex], { autoAlpha: 1 });
         anchors.forEach((a, i) => a.classList.toggle('is-visible', i === activeIndex));
-        if (activeIndex === 1) setCopyVisible(true);
         journeyTween = null;
+        if (activeIndex === 1) setCopyVisible(true);
       },
     });
   }
@@ -382,7 +427,7 @@ function buildRevealTransition() {
   function resolveActiveIndex() {
     if (window.scrollY <= 1) return 0;
 
-    const readingLine = window.innerHeight * 0.25;
+    const readingLine = window.innerHeight * 0.28;
     let resolvedIndex = 0;
 
     anchors.slice(1).forEach((anchor, index) => {
@@ -423,37 +468,11 @@ function buildRevealTransition() {
       start: 'top 28%',
       invalidateOnRefresh: true,
       onEnter: () => { if (triggersReady) moveProductTo(anchorIndex); },
-      onEnterBack: () => { if (triggersReady) moveProductTo(anchorIndex - 1); },
+      onLeaveBack: () => { if (triggersReady) moveProductTo(anchorIndex - 1); },
     });
   });
-
-  ScrollTrigger.addEventListener('scrollEnd', () => {
-    if (!triggersReady || journeyTween) return;
-    const nextIndex = resolveActiveIndex();
-    if (nextIndex !== activeIndex) settleProductAt(nextIndex);
-  });
-
-  // ScrollTrigger callbacks can be skipped when a touch scroll crosses more
-  // than one section in a single frame. Reconcile against the actual viewport
-  // on every scroll frame so the product never remains in the prior section.
-  window.addEventListener('scroll', () => {
-    if (!triggersReady) return;
-    window.cancelAnimationFrame(scrollFrame);
-    scrollFrame = window.requestAnimationFrame(() => {
-      const nextIndex = resolveActiveIndex();
-      if (nextIndex !== activeIndex) moveProductTo(nextIndex);
-    });
-  }, { passive: true });
 
   ScrollTrigger.addEventListener('refreshInit', syncAnchorSizes);
-  ScrollTrigger.addEventListener('refresh', () => {
-    if (!triggersReady) return;
-
-    const nextIndex = resolveActiveIndex();
-    // Mobile browser chrome can trigger refreshes while scrolling. Keep the
-    // already-visible copy untouched unless the active product section changed.
-    if (nextIndex !== activeIndex) settleProductAt(nextIndex);
-  });
 
   window.addEventListener('resize', () => {
     window.cancelAnimationFrame(resizeFrame);
@@ -470,7 +489,6 @@ function buildRevealTransition() {
   window.addEventListener('load', () => {
     syncAnchorSizes();
     ScrollTrigger.refresh();
-    if (triggersReady) settleProductAt(resolveActiveIndex());
   }, { once: true });
 }
 

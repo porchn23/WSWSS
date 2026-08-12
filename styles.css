@@ -691,7 +691,7 @@ html[data-language="en"] .use-price, html[data-language="ko"] .use-price { font-
 }
 
 .product-traveler {
-  position: fixed;
+  position: absolute;
   z-index: 100;
   top: 0;
   left: 0;

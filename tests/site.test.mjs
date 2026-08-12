@@ -28,7 +28,7 @@ test('SEO and AI discovery metadata describe the approved product without SPF cl
   assert.match(html, /rel="manifest"[^>]*assets\/favicon_io\/site\.webmanifest/i);
   assert.match(html, /application\/ld\+json/);
   assert.match(html, /styles\.css\?v=20260812-58/);
-  assert.match(html, /script\.js\?v=20260812-23/);
+  assert.match(html, /script\.js\?v=20260812-32/);
   assert.match(html, /"@type"\s*:\s*"Product"/);
   assert.match(html, /"offers"\s*:\s*\{[\s\S]*"@type"\s*:\s*"Offer"/);
   assert.match(html, /"priceCurrency"\s*:\s*"THB"/);
@@ -60,17 +60,31 @@ test('Section 2 keeps the right half of its transparent background art visible f
 
 test('Section 2 copy stays attached to the product and is not reset on a same-section ScrollTrigger refresh', async () => {
   const js = await readFile(new URL('script.js', root), 'utf8');
+  const css = await readFile(new URL('styles.css', root), 'utf8');
 
   assert.match(js, /const productRect = anchors\[1\]\.getBoundingClientRect\(\);[\s\S]*visibleProductInset = 132;[\s\S]*rightPx = stageRect\.right - productRect\.left - visibleProductInset;[\s\S]*availableCopyWidth = Math\.max\(0, productRect\.left - stageRect\.left - 24\);[\s\S]*copyWidth = Math\.min\(window\.innerWidth \* 0\.41, 464, availableCopyWidth\)/);
   assert.match(js, /const copyTop = Math\.max\(8, productRect\.top - stageRect\.top - 12\);[\s\S]*const copyLeft = productRect\.left - stageRect\.left \+ productRect\.width \/ 2;[\s\S]*yPercent: -100/);
   assert.match(js, /if \(visible === isCopyVisible\) return;/);
-  assert.match(js, /const nextIndex = resolveActiveIndex\(\);[\s\S]*if \(nextIndex !== activeIndex\) settleProductAt\(nextIndex\);/);
-  assert.match(js, /duration:\s*0\.42,[\s\S]*ease:\s*'power2\.out'/);
+  assert.match(js, /currentPosition \?\?= \{[\s\S]*left: sourceRect\.left \+ window\.scrollX,[\s\S]*top: sourceRect\.top \+ window\.scrollY/);
+  assert.match(js, /const targetPosition = \{[\s\S]*left: targetRect\.left \+ window\.scrollX,[\s\S]*top: targetRect\.top \+ window\.scrollY/);
+  assert.match(js, /gsap\.killTweensOf\(anchors\);[\s\S]*gsap\.set\(anchors, \{ autoAlpha: 0 \}\);/);
+  assert.match(js, /const arrivalPoint = 0\.82/);
+  assert.match(js, /const overshootDistance = Math\.min\(22, Math\.max\(10, travelDistance \* 0\.025\)\)/);
+  assert.match(js, /targetPosition\.top \+ directionY \* overshootDistance/);
+  assert.match(js, /if \(journeyTween\) \{[\s\S]*const travelerStyle = getComputedStyle\(traveler\);[\s\S]*startingOpacity = Number\.parseFloat\(travelerStyle\.opacity\);[\s\S]*journeyTween\.kill\(\);/);
+  assert.doesNotMatch(js, /queuedIndex/);
+  assert.match(js, /duration:\s*0\.68,[\s\S]*ease:\s*'power1\.inOut'/);
+  assert.match(js, /interpolate\(currentPosition\.left, overshootPosition\.left, motionProgress\)[\s\S]*interpolate\(overshootPosition\.left, targetPosition\.left, motionProgress\)/);
+  assert.match(js, /const lift = arriving \? Math\.sin\(Math\.PI \* motionProgress\) \* arcHeight : 0/);
+  assert.match(js, /const fadeOpacity = progress < 0\.5[\s\S]*interpolate\(startingOpacity, 0,[\s\S]*interpolate\(0, 1,/);
   assert.doesNotMatch(js, /back\.out\(1\.25\)/);
   assert.doesNotMatch(js, /const blur = gsap\.utils\.interpolate\(0, 6/);
-  assert.match(js, /onEnterBack: \(\) => \{ if \(triggersReady\) moveProductTo\(anchorIndex - 1\); \}/);
-  assert.match(js, /ScrollTrigger\.addEventListener\('scrollEnd',[\s\S]*if \(nextIndex !== activeIndex\) settleProductAt\(nextIndex\);/);
-  assert.match(js, /window\.addEventListener\('scroll',[\s\S]*window\.requestAnimationFrame\(\(\) => \{[\s\S]*if \(nextIndex !== activeIndex\) moveProductTo\(nextIndex\);/);
+  assert.match(js, /onLeaveBack: \(\) => \{ if \(triggersReady\) moveProductTo\(anchorIndex - 1\); \}/);
+  assert.doesNotMatch(js, /onEnterBack:/);
+  assert.doesNotMatch(js, /ScrollTrigger\.addEventListener\('scrollEnd'/);
+  assert.doesNotMatch(js, /window\.addEventListener\('scroll',[\s\S]*moveProductTo\(nextIndex\)/);
+  assert.match(js, /const readingLine = window\.innerHeight \* 0\.28/);
+  assert.match(css, /\.product-traveler\s*\{[\s\S]*position:\s*absolute;/);
 });
 
 test('Section 2 ends with the four-in-one product benefit summary', async () => {
@@ -116,7 +130,7 @@ test('English and Korean are crawlable, fully static locale pages', async () => 
     assert.match(html, /hreflang="en" href="https:\/\/www\.wswss\.com\/en\/"/);
     assert.match(html, /hreflang="ko" href="https:\/\/www\.wswss\.com\/ko\/"/);
     assert.match(html, /hreflang="x-default" href="https:\/\/www\.wswss\.com\/"/);
-    assert.match(html, /src="\.\.\/script\.js\?v=20260812-23"/);
+    assert.match(html, /src="\.\.\/script\.js\?v=20260812-32"/);
   }
 
   assert.doesNotMatch(english, /[ก-๙]|[가-힣]/);
