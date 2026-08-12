@@ -673,7 +673,21 @@ function buildRevealTransition() {
   window.addEventListener('orientationchange', refreshForMeaningfulResize, { passive: true });
 
   ScrollTrigger.refresh();
-  settleProductAt(resolveActiveIndex());
+  const initialOwner = resolveActiveIndex();
+  if (initialOwner === 0) {
+    // Hero is already visible in the initial HTML/CSS. Do not hide/show it again
+    // during startup; a late visibility handoff can push the Hero product's LCP
+    // timestamp even though it painted correctly on the first frame.
+    settledIndex = 0;
+    targetIndex = 0;
+    isTraveling = false;
+    travelerVariant = productVariantForIndex(0);
+    travelerBaseWidth = Math.max(1, anchors[0].getBoundingClientRect().width);
+    setCopyVisible(false, true);
+  } else {
+    // Preserve reload/deep-link behavior when the browser restores a lower scroll position.
+    settleProductAt(initialOwner);
+  }
   triggersReady = true;
 
   window.addEventListener('load', () => {
@@ -681,7 +695,10 @@ function buildRevealTransition() {
     triggersReady = false;
     syncAnchorSizes();
     ScrollTrigger.refresh();
-    settleProductAt(resolveActiveIndex());
+    const nextOwner = resolveActiveIndex(settledIndex);
+    // Refresh geometry after fonts/assets settle, but do not re-toggle the current
+    // product anchor unless ownership genuinely changed.
+    if (nextOwner !== settledIndex) settleProductAt(nextOwner);
     triggersReady = true;
   }, { once: true });
 }
@@ -751,7 +768,10 @@ if (!window.gsap || prefersReducedMotion.matches) {
   buildHeroTimeline();
   if (window.ScrollTrigger) {
     buildInfoSlides();
-    ensureAnimationAssetsReady().finally(buildRevealTransition);
+    // Product ownership must become live immediately. Variant decoding continues
+    // in parallel instead of blocking startup/LCP on below-the-fold assets.
+    buildRevealTransition();
+    ensureAnimationAssetsReady();
   } else {
     applyReducedMotionState();
   }
