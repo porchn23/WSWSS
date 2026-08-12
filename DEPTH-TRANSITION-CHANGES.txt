@@ -1,0 +1,23 @@
+WSWSS Depth Transition Build
+
+Scope: animation effect only. Layout/responsive geometry is unchanged.
+
+Motion rhythm (0.58s total):
+- 0-12%: opacity snaps from current value toward 0.14
+- 12-56%: product stays recessed at opacity 0.14
+- 56-70%: opacity snaps back to 1 before arrival
+- 70-82%: product remains fully visible approaching target
+- 82-100%: existing overshoot/landing shock is preserved
+
+Depth cue:
+- scale multiplier 1 -> 0.965 -> 1
+- transform + opacity only; no blur animation
+- opacity never reaches 0
+- retarget preserves current visual opacity
+
+CSS changes from Stable Animation build:
+- .product-traveler will-change: transform, opacity
+
+Cache versions:
+- styles.css?v=20260812-61
+- script.js?v=20260812-35

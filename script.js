@@ -197,6 +197,7 @@ function buildInfoSlides() {
 
 function buildRevealTransition() {
   gsap.registerPlugin(ScrollTrigger);
+  ScrollTrigger.config({ ignoreMobileResize: true });
 
   const anchors = gsap.utils.toArray('[data-product-anchor]');
   const traveler = document.querySelector('.product-traveler');
@@ -206,20 +207,70 @@ function buildRevealTransition() {
 
   if (anchors.length < 2 || !traveler) return;
 
-  let activeIndex = 0;
+  let settledIndex = 0;
+  let targetIndex = 0;
+  let isTraveling = false;
+  let travelerVariant = productVariantForIndex(0);
+  let travelerBaseWidth = Math.max(1, anchors[0].getBoundingClientRect().width);
   let journeyTween = null;
   let triggersReady = false;
   let resizeFrame = 0;
   let isCopyVisible = false;
+  let lastViewportWidth = window.innerWidth;
+  let lastOrientation = window.innerWidth >= window.innerHeight ? 'landscape' : 'portrait';
+
+  // Transition rhythm: disappear quickly after departure, become fully hidden
+  // for the asset swap, then snap back into view before the landing shock.
+  // The zero-opacity window is intentional and short: the traveler remains alive
+  // and tracked, but the image change itself is completely invisible.
+  const transitionFadeOutEnd = 0.12;
+  const transitionFadeInStart = 0.56;
+  const transitionFadeInEnd = 0.70;
+  const transitionTravelOpacity = 0;
+  const transitionDepthScaleMin = 0.965;
+
+  function transitionOpacity(progress, startOpacity = 1) {
+    if (progress <= transitionFadeOutEnd) {
+      return gsap.utils.interpolate(
+        startOpacity,
+        transitionTravelOpacity,
+        progress / transitionFadeOutEnd,
+      );
+    }
+    if (progress < transitionFadeInStart) return transitionTravelOpacity;
+    if (progress < transitionFadeInEnd) {
+      return gsap.utils.interpolate(
+        transitionTravelOpacity,
+        1,
+        (progress - transitionFadeInStart) / (transitionFadeInEnd - transitionFadeInStart),
+      );
+    }
+    return 1;
+  }
+
+  function transitionDepthScale(progress) {
+    if (progress <= transitionFadeOutEnd) {
+      return gsap.utils.interpolate(1, transitionDepthScaleMin, progress / transitionFadeOutEnd);
+    }
+    if (progress < transitionFadeInStart) return transitionDepthScaleMin;
+    if (progress < transitionFadeInEnd) {
+      return gsap.utils.interpolate(
+        transitionDepthScaleMin,
+        1,
+        (progress - transitionFadeInStart) / (transitionFadeInEnd - transitionFadeInStart),
+      );
+    }
+    return 1;
+  }
 
   gsap.set(revealCopy, { autoAlpha: 0, scale: 0.985 });
   gsap.set(copyItems, { autoAlpha: 0, y: 20 });
   gsap.set(anchors.slice(1), { autoAlpha: 0 });
-  gsap.set(traveler, { display: 'none' });
+  gsap.set(traveler, { display: 'none', opacity: 1, x: 0, y: 0, scale: 1 });
 
   function syncAnchorSizes() {
-    // Destination geometry belongs to CSS. Clearing legacy inline geometry here
-    // prevents GSAP refreshes from overriding device-specific layout rules.
+    // Destination geometry remains owned by CSS. JS only reads the resulting
+    // rectangles and never writes section-specific destination geometry.
     gsap.set(anchors.slice(1), { clearProps: 'width,left,right' });
 
     if (revealCopy) {
@@ -233,9 +284,6 @@ function buildRevealTransition() {
       const useCenteredLayout = window.innerWidth >= 700 || window.innerWidth > window.innerHeight;
 
       if (useCenteredLayout) {
-        // Product artwork has transparent padding around the visible tube.
-        // Overlap its layout frame so the copy sits against the visible product,
-        // rather than leaving a misleading empty gap on wide/landscape screens.
         const stage = revealStage || anchors[1].closest('section');
         const stageRect = stage.getBoundingClientRect();
         const productRect = anchors[1].getBoundingClientRect();
@@ -257,8 +305,6 @@ function buildRevealTransition() {
         const stage = revealStage;
         const stageRect = stage.getBoundingClientRect();
         const productRect = anchors[1].getBoundingClientRect();
-        // Keep the card within Section 2 even after the product is raised to
-        // make room for the benefit summary below it.
         const copyTop = Math.max(8, productRect.top - stageRect.top - 12);
         const copyLeft = productRect.left - stageRect.left + productRect.width / 2;
 
@@ -309,79 +355,120 @@ function buildRevealTransition() {
     });
   }
 
+  function swapTravelerVariantHidden(variant) {
+    if (!traveler || travelerVariant === variant) return;
+
+    // The traveler is already at opacity 0 during this window. Swap the image
+    // atomically instead of crossfading two product assets, so no intermediate
+    // shape/angle is ever visible when Standard <-> Section 3 changes.
+    setProductVariant(traveler, variant);
+    travelerVariant = variant;
+  }
+
+  function showTravelerFromAnchor(anchorIndex) {
+    const source = anchors[anchorIndex];
+    if (!source) return null;
+
+    const rect = source.getBoundingClientRect();
+    travelerBaseWidth = Math.max(1, rect.width);
+    travelerVariant = productVariantForIndex(anchorIndex);
+    setProductVariant(traveler, travelerVariant);
+
+    // Make the traveler paint-ready before removing the source representation.
+    gsap.set(traveler, {
+      display: 'block',
+      width: travelerBaseWidth,
+      x: rect.left + window.scrollX,
+      y: rect.top + window.scrollY,
+      scale: 1,
+      opacity: 1,
+    });
+    gsap.set(source, { autoAlpha: 0 });
+    source.classList.remove('is-visible');
+
+    return {
+      x: rect.left + window.scrollX,
+      y: rect.top + window.scrollY,
+      scale: 1,
+      opacity: 1,
+    };
+  }
+
+  function settleTravelerAtTarget(index) {
+    const target = anchors[index];
+    if (!target) return;
+
+    // Destination is made visible first. Traveler is hidden only after the
+    // destination is already paint-ready, eliminating empty handoff frames.
+    setProductVariant(target, productVariantForIndex(index));
+    gsap.set(anchors, { autoAlpha: 0 });
+    gsap.set(target, { autoAlpha: 1 });
+    anchors.forEach((anchor, anchorIndex) => anchor.classList.toggle('is-visible', anchorIndex === index));
+    gsap.set(traveler, { display: 'none', opacity: 1 });
+
+    settledIndex = index;
+    targetIndex = index;
+    isTraveling = false;
+    journeyTween = null;
+    travelerVariant = productVariantForIndex(index);
+    setCopyVisible(index === 1);
+  }
+
+  function currentTravelerPosition() {
+    return {
+      x: Number(gsap.getProperty(traveler, 'x')) || 0,
+      y: Number(gsap.getProperty(traveler, 'y')) || 0,
+      scale: Number(gsap.getProperty(traveler, 'scale')) || 1,
+      opacity: Number(gsap.getProperty(traveler, 'opacity')) || transitionTravelOpacity,
+    };
+  }
+
   function moveProductTo(nextIndex) {
     if (nextIndex < 0 || nextIndex >= anchors.length) return;
-    if (nextIndex === activeIndex) return;
+    if (!isTraveling && nextIndex === settledIndex) return;
+    if (isTraveling && nextIndex === targetIndex) return;
 
-    let currentPosition;
-    let startingOpacity = 1;
-    let sourceVariant = productVariantForIndex(activeIndex);
     if (journeyTween) {
-      // Retarget from the product's exact current document position. Fast
-      // scrolling across multiple sections therefore produces one direct move
-      // to the latest section, not a delayed chain through stale destinations.
-      const travelerStyle = getComputedStyle(traveler);
-      currentPosition = {
-        left: Number.parseFloat(travelerStyle.left),
-        top: Number.parseFloat(travelerStyle.top),
-        width: Number.parseFloat(travelerStyle.width),
-      };
-      startingOpacity = Number.parseFloat(travelerStyle.opacity);
-      sourceVariant = getActiveProductImage(traveler)?.dataset.productVariant || sourceVariant;
       journeyTween.kill();
       journeyTween = null;
     }
 
-    const targetVariant = productVariantForIndex(nextIndex);
-    const sourceRect = anchors[activeIndex].getBoundingClientRect();
+    const currentPosition = isTraveling
+      ? currentTravelerPosition()
+      : showTravelerFromAnchor(settledIndex);
+    if (!currentPosition) return;
 
-    syncAnchorSizes();
-    const targetRect = anchors[nextIndex].getBoundingClientRect();
-    currentPosition ??= {
-      left: sourceRect.left + window.scrollX,
-      top: sourceRect.top + window.scrollY,
-      width: sourceRect.width,
-    };
-    const targetPosition = {
-      left: targetRect.left + window.scrollX,
-      top: targetRect.top + window.scrollY,
-      width: targetRect.width,
-    };
-    gsap.killTweensOf(anchors);
-    gsap.set(anchors, { autoAlpha: 0 });
-    gsap.set(traveler, {
-      display: 'block',
-      left: currentPosition.left,
-      top: currentPosition.top,
-      width: currentPosition.width,
-      opacity: startingOpacity,
-    });
-    setProductVariant(traveler, sourceVariant, true);
-    activeIndex = nextIndex;
+    targetIndex = nextIndex;
+    isTraveling = true;
     setCopyVisible(false);
 
-    // Both endpoints use document coordinates. The product therefore scrolls
-    // with the page while travelling instead of chasing a moving viewport
-    // target and jumping across sections.
-    const travelState = { progress: 0 };
-    let productSwapped = sourceVariant === targetVariant;
+    const targetVariant = productVariantForIndex(nextIndex);
+    const targetRect = anchors[nextIndex].getBoundingClientRect();
+    const targetPosition = {
+      x: targetRect.left + window.scrollX,
+      y: targetRect.top + window.scrollY,
+      scale: targetRect.width / travelerBaseWidth,
+    };
+
     const travelDistance = Math.hypot(
-      targetPosition.left - currentPosition.left,
-      targetPosition.top - currentPosition.top,
+      targetPosition.x - currentPosition.x,
+      targetPosition.y - currentPosition.y,
     );
     const arcHeight = Math.min(64, Math.max(24, travelDistance * 0.045));
     const arrivalPoint = 0.82;
     const overshootDistance = Math.min(22, Math.max(10, travelDistance * 0.025));
-    const directionX = travelDistance ? (targetPosition.left - currentPosition.left) / travelDistance : 0;
-    const directionY = travelDistance ? (targetPosition.top - currentPosition.top) / travelDistance : 0;
+    const directionX = travelDistance ? (targetPosition.x - currentPosition.x) / travelDistance : 0;
+    const directionY = travelDistance ? (targetPosition.y - currentPosition.y) / travelDistance : 0;
     const overshootPosition = {
-      left: targetPosition.left + directionX * overshootDistance,
-      top: targetPosition.top + directionY * overshootDistance,
+      x: targetPosition.x + directionX * overshootDistance,
+      y: targetPosition.y + directionY * overshootDistance,
     };
+    const travelState = { progress: 0 };
+    let productSwapped = travelerVariant === targetVariant;
 
     journeyTween = gsap.to(travelState, {
       progress: 1,
-      duration: 0.68,
+      duration: 0.58,
       ease: 'power1.inOut',
       overwrite: true,
       onUpdate: () => {
@@ -390,36 +477,31 @@ function buildRevealTransition() {
         const motionProgress = arriving
           ? progress / arrivalPoint
           : (progress - arrivalPoint) / (1 - arrivalPoint);
-        const left = arriving
-          ? gsap.utils.interpolate(currentPosition.left, overshootPosition.left, motionProgress)
-          : gsap.utils.interpolate(overshootPosition.left, targetPosition.left, motionProgress);
-        const top = arriving
-          ? gsap.utils.interpolate(currentPosition.top, overshootPosition.top, motionProgress)
-          : gsap.utils.interpolate(overshootPosition.top, targetPosition.top, motionProgress);
+        const x = arriving
+          ? gsap.utils.interpolate(currentPosition.x, overshootPosition.x, motionProgress)
+          : gsap.utils.interpolate(overshootPosition.x, targetPosition.x, motionProgress);
+        const y = arriving
+          ? gsap.utils.interpolate(currentPosition.y, overshootPosition.y, motionProgress)
+          : gsap.utils.interpolate(overshootPosition.y, targetPosition.y, motionProgress);
         const lift = arriving ? Math.sin(Math.PI * motionProgress) * arcHeight : 0;
         const sizeProgress = Math.min(progress / arrivalPoint, 1);
-        const fadeOpacity = progress < 0.5
-          ? gsap.utils.interpolate(startingOpacity, 0, progress / 0.5)
-          : gsap.utils.interpolate(0, 1, (progress - 0.5) / 0.5);
+        const baseScale = gsap.utils.interpolate(currentPosition.scale, targetPosition.scale, sizeProgress);
+
         gsap.set(traveler, {
-          left,
-          top: top - lift,
-          width: gsap.utils.interpolate(currentPosition.width, targetPosition.width, sizeProgress),
-          opacity: fadeOpacity,
+          x,
+          y: y - lift,
+          scale: baseScale * transitionDepthScale(progress),
+          opacity: transitionOpacity(progress, currentPosition.opacity),
         });
-        if (!productSwapped && progress >= 0.5) {
-          setProductVariant(traveler, targetVariant, true);
+
+        if (!productSwapped && progress >= 0.46) {
+          swapTravelerVariantHidden(targetVariant);
           productSwapped = true;
         }
       },
       onComplete: () => {
-        gsap.set(traveler, { display: 'none', opacity: 1 });
-        gsap.set(anchors, { autoAlpha: 0 });
-        setProductVariant(anchors[activeIndex], productVariantForIndex(activeIndex), true);
-        gsap.set(anchors[activeIndex], { autoAlpha: 1 });
-        anchors.forEach((a, i) => a.classList.toggle('is-visible', i === activeIndex));
-        journeyTween = null;
-        if (activeIndex === 1) setCopyVisible(true);
+        if (targetIndex !== nextIndex) return;
+        settleTravelerAtTarget(nextIndex);
       },
     });
   }
@@ -446,14 +528,19 @@ function buildRevealTransition() {
       journeyTween = null;
     }
 
-    activeIndex = nextIndex;
     syncAnchorSizes();
-    gsap.set(traveler, { display: 'none' });
     gsap.set(anchors, { autoAlpha: 0 });
-    setProductVariant(anchors[activeIndex], productVariantForIndex(activeIndex), true);
-    gsap.set(anchors[activeIndex], { autoAlpha: 1 });
-    anchors.forEach((a, i) => a.classList.toggle('is-visible', i === activeIndex));
-    setCopyVisible(activeIndex === 1, true);
+    setProductVariant(anchors[nextIndex], productVariantForIndex(nextIndex));
+    gsap.set(anchors[nextIndex], { autoAlpha: 1 });
+    anchors.forEach((anchor, index) => anchor.classList.toggle('is-visible', index === nextIndex));
+    gsap.set(traveler, { display: 'none', opacity: 1, x: 0, y: 0, scale: 1 });
+
+    settledIndex = nextIndex;
+    targetIndex = nextIndex;
+    isTraveling = false;
+    travelerVariant = productVariantForIndex(nextIndex);
+    travelerBaseWidth = Math.max(1, anchors[nextIndex].getBoundingClientRect().width);
+    setCopyVisible(nextIndex === 1, true);
   }
 
   syncAnchorSizes();
@@ -472,24 +559,66 @@ function buildRevealTransition() {
     });
   });
 
-  ScrollTrigger.addEventListener('refreshInit', syncAnchorSizes);
+  ScrollTrigger.addEventListener('refreshInit', () => {
+    if (!isTraveling) syncAnchorSizes();
+  });
 
-  window.addEventListener('resize', () => {
+  function refreshForMeaningfulResize() {
+    const viewportWidth = window.innerWidth;
+    const orientation = window.innerWidth >= window.innerHeight ? 'landscape' : 'portrait';
+    const widthChanged = Math.abs(viewportWidth - lastViewportWidth) > 2;
+    const orientationChanged = orientation !== lastOrientation;
+    if (!widthChanged && !orientationChanged) return;
+
+    lastViewportWidth = viewportWidth;
+    lastOrientation = orientation;
     window.cancelAnimationFrame(resizeFrame);
     resizeFrame = window.requestAnimationFrame(() => {
+      if (journeyTween) {
+        journeyTween.kill();
+        journeyTween = null;
+      }
+      isTraveling = false;
+      triggersReady = false;
       syncAnchorSizes();
       ScrollTrigger.refresh();
+      settleProductAt(resolveActiveIndex());
+      triggersReady = true;
     });
-  });
+  }
+
+  window.addEventListener('resize', refreshForMeaningfulResize, { passive: true });
+  window.addEventListener('orientationchange', refreshForMeaningfulResize, { passive: true });
 
   ScrollTrigger.refresh();
   settleProductAt(resolveActiveIndex());
   triggersReady = true;
 
   window.addEventListener('load', () => {
+    if (isTraveling) return;
+    triggersReady = false;
     syncAnchorSizes();
     ScrollTrigger.refresh();
+    settleProductAt(resolveActiveIndex());
+    triggersReady = true;
   }, { once: true });
+}
+
+async function ensureAnimationAssetsReady() {
+  const images = [...document.querySelectorAll('[data-product-variant]')];
+  const uniqueImages = [...new Map(images.map((image) => [image.currentSrc || image.src, image])).values()];
+
+  await Promise.allSettled(uniqueImages.map(async (image) => {
+    if (!image.complete) {
+      await new Promise((resolve) => {
+        image.addEventListener('load', resolve, { once: true });
+        image.addEventListener('error', resolve, { once: true });
+      });
+    }
+    if (typeof image.decode === 'function') {
+      try { await image.decode(); } catch (_) { /* loaded image can still be painted */ }
+    }
+  }));
 }
 
 function buildDocumentModal() {
@@ -540,7 +669,7 @@ if (!window.gsap || prefersReducedMotion.matches) {
   buildHeroTimeline();
   if (window.ScrollTrigger) {
     buildInfoSlides();
-    buildRevealTransition();
+    ensureAnimationAssetsReady().finally(buildRevealTransition);
   } else {
     applyReducedMotionState();
   }

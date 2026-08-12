@@ -698,8 +698,10 @@ html[data-language="en"] .use-price, html[data-language="ko"] .use-price { font-
   top: 0;
   left: 0;
   display: none;
-  width: 1px;
-  will-change: top, left, width;
+  width: var(--shared-product-width, 1px);
+  transform-origin: top left;
+  will-change: transform, opacity;
+  backface-visibility: hidden;
 }
 
 .product-traveler img {

@@ -1,0 +1,7 @@
+WSWSS zero-opacity swap update
+
+- Transition now reaches opacity 0 during the hidden travel window.
+- Product variant swap is atomic while the traveler is fully transparent.
+- Removed inner-image crossfade during Standard <-> Section 3 swap.
+- Existing 0.58s travel rhythm, 82% overshoot point, landing shock, layout and responsive geometry are unchanged.
+- script.js cache version bumped to 20260812-36.

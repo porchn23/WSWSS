@@ -1,0 +1,28 @@
+WSWSS — Stable Animation Build
+Date: 2026-08-12
+
+Scope
+- Animation stability only. Existing section layout, breakpoints, final product positions,
+  final product sizes, Section 3 rotation, backgrounds and copy are preserved.
+- Includes the earlier LCP/performance optimizations as the baseline.
+
+Animation stability changes
+1. Replaced single activeIndex state with settledIndex / targetIndex / isTraveling.
+2. Fast-scroll retarget now starts from the traveler's current rendered transform.
+3. Traveler no longer fades to opacity 0 during product movement.
+4. Product variant changes use image-level crossfade inside the traveler.
+5. Handoff order is safe: destination becomes visible before traveler is hidden.
+6. Traveler motion now updates transform (x/y/scale), not top/left/width every frame.
+7. Existing arc/overshoot movement is preserved.
+8. Mobile height-only resize noise is ignored; meaningful width/orientation changes
+   are refreshed deterministically.
+9. ScrollTrigger callbacks are temporarily locked during geometry refresh/settle.
+10. Product animation assets are eager-loaded/decoded; Section 3 asset is low-priority
+    preloaded so it is ready without competing aggressively with the hero.
+
+Files to deploy
+- index.html
+- styles.css
+- script.js
+
+No asset files were changed.
