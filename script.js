@@ -39,8 +39,26 @@ const translations = {
 function setupLanguageSwitcher() {
   const trigger = document.querySelector('.language');
   const menu = document.querySelector('.language-menu');
-  const options = [...document.querySelectorAll('[data-language]')];
+  const options = [...document.querySelectorAll('.language-menu [data-language]')];
   if (!trigger || !menu || !options.length) return;
+  const staticLanguage = document.documentElement.dataset.staticLanguage;
+
+  if (staticLanguage) {
+    trigger.childNodes[0].nodeValue = `${staticLanguage.toUpperCase()} `;
+    options.forEach((option) => option.setAttribute('aria-current', String(option.dataset.language === staticLanguage)));
+    trigger.addEventListener('click', () => {
+      const isOpen = !menu.hidden;
+      menu.hidden = isOpen;
+      trigger.setAttribute('aria-expanded', String(!isOpen));
+    });
+    document.addEventListener('click', (event) => {
+      if (!event.target.closest('.language-switcher')) {
+        menu.hidden = true;
+        trigger.setAttribute('aria-expanded', 'false');
+      }
+    });
+    return;
+  }
   const originalText = new Map([...document.querySelectorAll('[data-i18n]')].map((element) => [element, element.textContent]));
 
   const applyLanguage = (language) => {

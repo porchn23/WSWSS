@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="th">
+<html lang="th" data-static-language="th">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -31,6 +31,9 @@
     <link rel="manifest" href="assets/favicon_io/site.webmanifest" />
     <link rel="canonical" href="https://www.wswss.com/" />
     <link rel="alternate" hreflang="th" href="https://www.wswss.com/" />
+    <link rel="alternate" hreflang="en" href="https://www.wswss.com/en/" />
+    <link rel="alternate" hreflang="ko" href="https://www.wswss.com/ko/" />
+    <link rel="alternate" hreflang="x-default" href="https://www.wswss.com/" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500&family=Noto+Sans+KR:wght@300;400;500;600&family=Noto+Sans+Thai:wght@300;400;500;600&display=swap" rel="stylesheet" />
@@ -122,9 +125,9 @@
             <div class="language-switcher">
               <button class="language" type="button" aria-label="Choose language" aria-expanded="false">TH <i></i></button>
               <div class="language-menu" role="menu" hidden>
-                <button type="button" role="menuitem" data-language="th">ไทย</button>
-                <button type="button" role="menuitem" data-language="en">English</button>
-                <button type="button" role="menuitem" data-language="ko">한국어</button>
+                <a role="menuitem" data-language="th" href="/">ไทย</a>
+                <a role="menuitem" data-language="en" href="/en/">English</a>
+                <a role="menuitem" data-language="ko" href="/ko/">한국어</a>
               </div>
             </div>
           </div>

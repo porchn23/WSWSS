@@ -92,11 +92,35 @@ test('language switcher supplies Thai, English, and Korean content with a header
   const js = await readFile(new URL('script.js', root), 'utf8');
 
   assert.match(html, /class="header-order" href="https:\/\/lin\.ee\/sGY1qQP"/);
-  assert.match(html, /data-language="th">ไทย/);
-  assert.match(html, /data-language="en">English/);
-  assert.match(html, /data-language="ko">한국어/);
+  assert.match(html, /data-language="th" href="\/">ไทย/);
+  assert.match(html, /data-language="en" href="\/en\/">English/);
+  assert.match(html, /data-language="ko" href="\/ko\/">한국어/);
   assert.match(js, /const translations = \{[\s\S]*en:\s*\{[\s\S]*ko:\s*\{/);
   assert.match(js, /localStorage\.setItem\('wswss-language', language\)/);
+});
+
+test('English and Korean are crawlable, fully static locale pages', async () => {
+  const [english, korean] = await Promise.all([
+    readFile(new URL('en/index.html', root), 'utf8'),
+    readFile(new URL('ko/index.html', root), 'utf8'),
+  ]);
+
+  for (const [html, language, url, ogLocale] of [
+    [english, 'en', 'https://www.wswss.com/en/', 'en_US'],
+    [korean, 'ko', 'https://www.wswss.com/ko/', 'ko_KR'],
+  ]) {
+    assert.match(html, new RegExp(`<html lang="${language}" data-static-language="${language}"`));
+    assert.match(html, new RegExp(`rel="canonical" href="${url}"`));
+    assert.match(html, new RegExp(`property="og:locale" content="${ogLocale}"`));
+    assert.match(html, /hreflang="th" href="https:\/\/www\.wswss\.com\/"/);
+    assert.match(html, /hreflang="en" href="https:\/\/www\.wswss\.com\/en\/"/);
+    assert.match(html, /hreflang="ko" href="https:\/\/www\.wswss\.com\/ko\/"/);
+    assert.match(html, /hreflang="x-default" href="https:\/\/www\.wswss\.com\/"/);
+    assert.match(html, /src="\.\.\/script\.js\?v=20260812-23"/);
+  }
+
+  assert.doesNotMatch(english, /[ก-๙]|[가-힣]/);
+  assert.doesNotMatch(korean, /[ก-๙]/);
 });
 
 test('English and Korean typography is compact enough for the existing responsive sections', async () => {
@@ -128,6 +152,8 @@ test('crawler discovery files expose the canonical site to search and AI crawler
   assert.match(robots, /User-agent: OAI-SearchBot[\s\S]*Allow: \//);
   assert.match(robots, /Sitemap: https:\/\/www\.wswss\.com\/sitemap\.xml/);
   assert.match(sitemap, /<loc>https:\/\/www\.wswss\.com\/<\/loc>/);
+  assert.match(sitemap, /<loc>https:\/\/www\.wswss\.com\/en\/<\/loc>/);
+  assert.match(sitemap, /<loc>https:\/\/www\.wswss\.com\/ko\/<\/loc>/);
   assert.match(sitemap, /พรพรร WSWSS/);
   assert.match(llms, /พรพรร WSWSS/);
   assert.match(llms, /10-2-6800028677/);
