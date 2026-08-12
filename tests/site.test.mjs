@@ -17,8 +17,8 @@ test('all internal navigation targets exist and no placeholder legal links remai
 test('SEO and AI discovery metadata describe the approved product without SPF claims', async () => {
   const html = await readFile(new URL('index.html', root), 'utf8');
 
-  assert.match(html, /<title>[^<]*พรพรร[^<]*WSWSS/i);
-  assert.match(html, /name="description"[^>]*พรพรร[^>]*WSWSS/i);
+  assert.match(html, /<title>พรพรร Bright Tone-Up Moisture Cream[^<]*<\/title>/i);
+  assert.match(html, /name="description"[^>]*พรพรร Bright Tone-Up Moisture Cream/i);
   assert.match(html, /name="robots"/i);
   assert.match(html, /rel="canonical"[^>]*https:\/\/www\.wswss\.com\//i);
   assert.match(html, /property="og:title"/i);
@@ -169,7 +169,7 @@ test('crawler discovery files expose the canonical site to search and AI crawler
   assert.match(sitemap, /<loc>https:\/\/www\.wswss\.com\/en\/<\/loc>/);
   assert.match(sitemap, /<loc>https:\/\/www\.wswss\.com\/ko\/<\/loc>/);
   assert.match(sitemap, /พรพรร WSWSS/);
-  assert.match(llms, /พรพรร WSWSS/);
+  assert.match(llms, /พรพรร Bright Tone-Up Moisture Cream/);
   assert.match(llms, /10-2-6800028677/);
   assert.match(llms, /ISO 22716 \(Cosmetics GMP\)/);
   assert.match(llms, /Tone-Up \(ผิวดูกระจ่างใสอย่างเป็นธรรมชาติ\)/);
