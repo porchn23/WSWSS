@@ -10,6 +10,7 @@ test('Section 4 contains factory facts and supplied certificate previews', async
 
   assert.match(html, /class="formula-section" id="section-4"/);
   assert.match(html, /BEHIND THE FORMULA/);
+  assert.match(html, /มาตรฐานของโรงงานผู้ผลิต: ISO 22716 \(Cosmetics GMP\)/);
   assert.match(html, /10-2-6800028677/);
   assert.match(html, /assets\/section4\/iso22716\.png/);
   assert.match(html, /class="product-destination formula-product" data-product-anchor/);

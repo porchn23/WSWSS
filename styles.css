@@ -21,6 +21,7 @@
 .use-art { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center calc(50% + 30px); }
 .use-step h3 { position: absolute; z-index: 2; bottom: 2.65rem; left: 1rem; margin: 0; color: var(--mint); font-size: clamp(1.1rem, 1.45vw, 1.4rem); font-weight: 500; }.use-step p { position: absolute; z-index: 2; right: 1rem; bottom: .8rem; left: 1rem; margin: 0; color: #fff; font-size: clamp(.68rem, .8vw, .8rem); line-height: 1.5; text-shadow: 0 1px 6px rgba(29, 64, 58, .46); }
 .use-cta-stage { position: relative; min-height: clamp(28rem, 43vw, 34rem); padding: clamp(2.4rem, 4vw, 3.8rem) 0; background: #f7fcfb url("assets/section5/S5BG.png") center / cover no-repeat; overflow: hidden; }.use-cta-copy { position: relative; z-index: 2; padding-right: clamp(13rem, 28vw, 24rem); }.use-line { margin: 0; color: var(--mint); font-family: "Maisonelle", cursive; font-size: clamp(1.25rem, 2vw, 1.8rem); }.use-cta-copy h2 { margin: .55rem 0; color: #40504e; font-size: clamp(2.1rem, 4.3vw, 4rem); font-weight: 400; line-height: 1.05; }.use-cta-copy h2 span { color: var(--mint); }.use-cta-copy > p:not(.use-line) { margin: 0; color: #61716e; font-size: clamp(.78rem, 1vw, 1rem); }
+.use-cta-copy .use-price { display: flex; flex-wrap: wrap; align-items: baseline; gap: .45rem; margin-top: .8rem; color: #40504e; font-size: clamp(.95rem, 1.35vw, 1.2rem); font-weight: 500; }.use-price span { padding: .18rem .48rem; border-radius: 999px; background: #f12835; color: #fff; font-size: .72em; font-weight: 600; }.use-price del { color: #7b8582; font-size: .9em; }.use-price strong { color: #e32130; font-size: 1.25em; font-weight: 600; }
 .use-actions { display: flex; gap: .7rem; width: min(100%, 25rem); margin-top: 1rem; }.use-order, .use-details { display: flex; flex: 1; justify-content: space-between; align-items: center; margin: 0; padding: .75rem 1.1rem; border-radius: .55rem; font-size: .85rem; text-decoration: none; }.use-order { background: var(--mint); color: #fff; }.use-order b { font-size: 1.2rem; }.use-details { justify-content: center; border: 1px solid var(--mint); color: #1c9789; background: rgba(255,255,255,.46); }
 .use-meta { display: flex; flex-wrap: wrap; gap: .65rem 1rem; margin-top: .85rem; color: #5b706b; font-size: clamp(.56rem, .7vw, .7rem); }.use-meta span { padding-right: 1rem; border-right: 1px solid rgba(23,131,117,.25); }.use-meta span:last-child { border-right: 0; }.use-line-qr { display: flex; align-items: center; gap: .65rem; margin-top: .75rem; color: #5f716d; font-size: .7rem; line-height: 1.45; }.use-line-qr img { width: 3.05rem; height: 3.05rem; padding: .2rem; border: 1px solid rgba(18,183,167,.28); border-radius: .35rem; background: #fff; object-fit: contain; }
 .site-footer { display: grid; grid-template-columns: auto 1fr auto auto; gap: 1.8rem; align-items: center; min-height: 4.3rem; padding: .85rem max(2rem, calc((100% - var(--content-max)) / 2)); border-top: 1px solid rgba(18,183,167,.18); background: #f8fcfb; color: #65736f; font-size: .58rem; }.footer-brand img { display: block; width: 7.3rem; height: auto; }.footer-nav, .footer-legal { display: flex; gap: 1.2rem; }.site-footer a { color: inherit; text-decoration: none; }.site-footer p { margin: 0; white-space: nowrap; }
@@ -483,15 +484,13 @@ button {
   position: absolute;
   z-index: 0;
   top: 0;
-  left: 0;
+  left: max(0px, calc(50% - var(--content-max) / 2));
   height: 100%;
-  width: auto;
-  max-width: none;
+  width: min(50%, calc(var(--content-max) / 2));
+  max-width: calc(var(--content-max) / 2);
   object-fit: contain;
-  object-position: left center;
+  object-position: left bottom;
   transform: none;
-  -webkit-mask-image: linear-gradient(to right, #000 0%, #000 68%, transparent 100%);
-  mask-image: linear-gradient(to right, #000 0%, #000 68%, transparent 100%);
 }
 
 .reveal-copy {
@@ -619,6 +618,8 @@ button {
 .reveal-title span {
   display: block;
 }
+
+.reveal-product-benefits { position: absolute; z-index: 3; bottom: clamp(1rem, 2.2vw, 1.75rem); left: 50%; width: min(calc(100% - 3rem), 38rem); margin: 0; color: #40504e; font-size: clamp(.68rem, .9vw, .9rem); line-height: 1.55; text-align: center; transform: translateX(-50%); }.reveal-product-benefits strong { color: var(--mint); font-weight: 600; }.reveal-product-benefits span { color: #61716e; }
 
 .product-destination,
 .product-traveler {
@@ -1389,6 +1390,20 @@ button {
   .reveal-title {
     text-align: center;
   }
+
+  .reveal-product-benefits { right: 1rem; bottom: calc(var(--shared-product-width) + 1rem); left: 1rem; width: auto; font-size: .67rem; transform: none; }
+}
+
+/* Centre the Section 2 artwork on the left edge of the max-width site frame. */
+.reveal-face {
+  top: 0;
+  left: max(100px, calc(50% - var(--content-max) / 2 + 100px));
+  width: auto;
+  max-width: none;
+  height: 100%;
+  object-fit: contain;
+  object-position: left bottom;
+  transform: translate(-50%, 80px) scale(1.4);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1885,12 +1900,6 @@ svg {
   white-space: nowrap;
 }
 
-/* Section 2: enlarge only the background art; the stage remains unchanged. */
-.reveal-face {
-  transform: translateY(40px) scale(1.4);
-  transform-origin: left center;
-}
-
 @media (min-width: 992px) and (max-width: 1199px) {
   :root {
     --shared-product-width: 25rem;
@@ -1959,10 +1968,6 @@ svg {
 }
 
 @media (orientation: portrait) and (max-width: 699px) {
-  .reveal-face {
-    transform: translate(-250px, 40px) scale(1.4);
-  }
-
   .formula-content,
   .use-cta-copy {
     padding-bottom: calc(var(--shared-product-width) + 1.5rem);
