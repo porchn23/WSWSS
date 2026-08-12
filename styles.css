@@ -2034,37 +2034,56 @@ svg {
 }
 
 
-/* Section 3: clearer benefit hierarchy — content-only visual refinement */
+/* Section 3: typography hierarchy fix */
 .info-slide-label {
   color: #35403e;
-  font-size: clamp(0.82rem, 1.08vw, 1.08rem);
+  font-size: clamp(0.98rem, 1.24vw, 1.22rem);
   font-weight: 600;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.015em;
+  line-height: 1.25;
 }
 
 .info-slide-grid .benefit-key {
   color: #12a994;
   font-style: normal;
-  font-weight: 650;
+  font-weight: 400;
+}
+
+/* FUNCTION / RESULT are sub-headings */
+.info-slide-grid div > span {
+  color: #357f76;
+  font-size: clamp(0.7rem, 0.8vw, 0.78rem);
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  line-height: 1.2;
+}
+
+/* Body copy stays regular and visually below the headings */
+.info-slide-grid strong {
+  color: #35403e;
+  font-size: clamp(0.82rem, 1vw, 0.98rem);
+  font-weight: 400;
+  line-height: 1.45;
 }
 
 .info-formula {
   display: flex;
   align-items: baseline;
   gap: 0.65rem;
+  margin-top: 0.1rem;
 }
 
 .info-formula span {
   flex: 0 0 auto;
-  color: var(--mint);
-  font-size: 0.7rem;
+  color: #357f76;
+  font-size: 0.64rem;
   font-weight: 600;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.09em;
 }
 
 .info-formula strong {
-  color: #65716e;
-  font-size: clamp(0.75rem, 0.9vw, 0.92rem);
+  color: #697572;
+  font-size: clamp(0.66rem, 0.76vw, 0.76rem);
   font-weight: 400;
   line-height: 1.4;
 }
