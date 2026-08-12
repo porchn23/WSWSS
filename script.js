@@ -6,7 +6,7 @@ if (copyrightYear) copyrightYear.textContent = String(new Date().getFullYear());
 const translations = {
   en: {
     navProduct: 'PRODUCT', navReveal: 'SKIN REVEAL', navWhy: 'WHY WSWSS', navStandards: 'STANDARDS', navHow: 'HOW TO USE', headerOrder: 'ORDER NOW',
-    heroToday: 'Today,', heroMakeup: 'makeup', heroBeautiful: 'looks beautiful.', heroBelief: 'Give makeup a break. Let your skin feel light—beauty never takes a break.',
+    heroToday: 'Today,', heroMakeup: 'makeup', heroBeautiful: 'looks beautiful.', heroBelief: 'Give makeup a break and let your skin feel light—beauty never takes a break! WSWSS helps skin look brighter and feel hydrated, for a naturally beautiful finish that feels light, comfortable, and never cakey.',
     revealPremise: 'Natural makeup should not begin by covering up real skin.', revealTitleOne: 'Reveal your beauty,', revealTitleTwo: 'beyond what it was before.', revealBenefitOne: 'Show real skin', revealBenefitTwo: 'No floating look', revealBenefitThree: 'No dull cast',
     fourBenefits: '4 benefits in one: Tone-Up · Moisture · Primer · Whitening — For skin that looks brighter, moisturized, smoother, and ready for makeup.',
     infoPayoff: 'Bright · Moisturized · Smooth', slideOneToneUp: 'Helps skin look brighter', slideOneMoisture: 'Helps replenish moisture', slideOneCopy: 'Together, they help skin look naturally brighter, moisturized, and smooth.',
@@ -21,7 +21,7 @@ const translations = {
   },
   ko: {
     navProduct: '제품', navReveal: '피부 표현', navWhy: 'WSWSS 특징', navStandards: '제조 기준', navHow: '사용 방법', headerOrder: '주문하기',
-    heroToday: '오늘은', heroMakeup: '메이크업 없이도', heroBeautiful: '예뻐요.', heroBelief: '메이크업은 잠시 쉬고, 피부는 가볍게. 아름다움은 쉬지 않으니까.',
+    heroToday: '오늘은', heroMakeup: '메이크업 없이도', heroBeautiful: '예뻐요.', heroBelief: '메이크업은 잠시 쉬고, 피부는 가볍게. 아름다움은 쉴 수 없으니까! WSWSS로 피부를 맑고 촉촉하게, 본연의 아름다움은 자연스럽게 더 또렷하게. 가볍고 편안하게, 두껍거나 답답해 보이지 않게.',
     revealPremise: '내추럴 메이크업은 본연의 피부를 가리는 것에서 시작하지 않습니다.', revealTitleOne: '피부 본연의 아름다움을', revealTitleTwo: '더 빛나게.', revealBenefitOne: '본연의 피부 표현', revealBenefitTwo: '들뜸 없는 피부', revealBenefitThree: '칙칙함 없는 피부',
     fourBenefits: '4가지 기능을 하나에: Tone-Up · Moisture · Primer · Whitening — 피부를 더 밝고 촉촉하며 매끈하게, 메이크업 준비까지.',
     infoPayoff: '맑게 · 촉촉하게 · 매끈하게', slideOneToneUp: '피부를 자연스럽게 화사하게', slideOneMoisture: '수분 충전', slideOneCopy: '함께 작용해 피부를 자연스럽게 밝고 촉촉하며 매끈하게 표현합니다.',
