@@ -195,6 +195,76 @@ function buildInfoSlides() {
   }));
 }
 
+
+function chooseProductOwner(sectionRects, viewportHeight, scrollY, maxScroll, currentIndex = 0) {
+  const count = sectionRects.length;
+  if (!count) return 0;
+
+  const viewport = Math.max(1, viewportHeight);
+  const safeCurrent = Math.max(0, Math.min(count - 1, currentIndex));
+  const distanceToBottom = Math.max(0, maxScroll - scrollY);
+
+  // Document edges are semantic states, not ordinary viewport positions.
+  // This guarantees Hero ownership at the real top and the final product
+  // section at the real bottom even on tall portrait screens.
+  const edgeLock = Math.min(72, viewport * 0.08);
+  if (scrollY <= edgeLock) return 0;
+  if (distanceToBottom <= edgeLock) return count - 1;
+
+  // The focus point is only a tiebreaker. Near the document edges it moves
+  // toward that edge, then converges to viewport center through the body.
+  const edgeRange = viewport * 0.7;
+  const topBlend = Math.min(1, Math.max(0, scrollY / edgeRange));
+  const bottomBlend = Math.min(1, Math.max(0, distanceToBottom / edgeRange));
+  let focusRatio = 0.5;
+  if (topBlend < 1) focusRatio = 0.22 + (0.5 - 0.22) * topBlend;
+  else if (bottomBlend < 1) focusRatio = 0.78 + (0.5 - 0.78) * bottomBlend;
+  const focusY = viewport * focusRatio;
+
+  const metrics = sectionRects.map((rect) => {
+    const height = Math.max(1, rect.height || (rect.bottom - rect.top));
+    const visibleTop = Math.max(0, rect.top);
+    const visibleBottom = Math.min(viewport, rect.bottom);
+    const visiblePixels = Math.max(0, visibleBottom - visibleTop);
+    const viewportShare = visiblePixels / viewport;
+    const sectionShare = Math.min(1, visiblePixels / height);
+    const sectionCenter = (rect.top + rect.bottom) / 2;
+    const focusAffinity = Math.max(0, 1 - Math.abs(sectionCenter - focusY) / (viewport * 0.85));
+    const fullVisibilityBonus = sectionShare >= 0.96 ? 0.06 : 0;
+
+    // Visibility owns the decision. Focus contributes only 8%, so a section
+    // that merely crosses a line can never beat one filling most of the view.
+    const score =
+      viewportShare * 0.62 +
+      sectionShare * 0.30 +
+      focusAffinity * 0.08 +
+      fullVisibilityBonus;
+
+    return { visiblePixels, viewportShare, sectionShare, score };
+  });
+
+  let bestIndex = safeCurrent;
+  for (let index = 0; index < metrics.length; index += 1) {
+    if (metrics[index].score > metrics[bestIndex].score) bestIndex = index;
+  }
+
+  if (bestIndex === safeCurrent) return safeCurrent;
+
+  const current = metrics[safeCurrent];
+  const challenger = metrics[bestIndex];
+
+  // Once the current owner is effectively gone, do not let hysteresis hold it.
+  if (current.viewportShare < 0.08 || current.sectionShare < 0.10) return bestIndex;
+
+  // A tiny sliver can be visible but is not a legitimate owner.
+  if (challenger.viewportShare < 0.08 && challenger.sectionShare < 0.15) return safeCurrent;
+
+  // Hysteresis prevents flip-flopping at boundaries. A fully visible challenger
+  // needs slightly less extra lead because it is visually unambiguous.
+  const switchMargin = challenger.sectionShare >= 0.96 ? 0.055 : 0.075;
+  return challenger.score > current.score + switchMargin ? bestIndex : safeCurrent;
+}
+
 function buildRevealTransition() {
   gsap.registerPlugin(ScrollTrigger);
   ScrollTrigger.config({ ignoreMobileResize: true });
@@ -506,20 +576,41 @@ function buildRevealTransition() {
     });
   }
 
-  function resolveActiveIndex() {
-    if (window.scrollY <= 1) return 0;
+  const sections = anchors.map((anchor) => anchor.closest('section'));
+  let ownershipFrame = 0;
 
-    const readingLine = window.innerHeight * 0.28;
-    let resolvedIndex = 0;
-
-    anchors.slice(1).forEach((anchor, index) => {
-      const section = anchor.closest('section');
-      if (section && section.getBoundingClientRect().top <= readingLine) {
-        resolvedIndex = index + 1;
-      }
+  function resolveActiveIndex(currentIndex = isTraveling ? targetIndex : settledIndex) {
+    const sectionRects = sections.map((section) => {
+      if (!section) return { top: Infinity, bottom: Infinity, height: 1 };
+      const rect = section.getBoundingClientRect();
+      return { top: rect.top, bottom: rect.bottom, height: rect.height };
     });
+    const maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+    return chooseProductOwner(
+      sectionRects,
+      window.innerHeight,
+      window.scrollY,
+      maxScroll,
+      currentIndex,
+    );
+  }
 
-    return resolvedIndex;
+  function evaluateProductOwnership({ immediate = false } = {}) {
+    if (!triggersReady) return;
+    const currentOwner = isTraveling ? targetIndex : settledIndex;
+    const nextOwner = resolveActiveIndex(currentOwner);
+    if (nextOwner === currentOwner) return;
+
+    if (immediate) settleProductAt(nextOwner);
+    else moveProductTo(nextOwner);
+  }
+
+  function scheduleOwnershipEvaluation() {
+    if (!triggersReady || ownershipFrame) return;
+    ownershipFrame = window.requestAnimationFrame(() => {
+      ownershipFrame = 0;
+      evaluateProductOwnership();
+    });
   }
 
   function settleProductAt(nextIndex) {
@@ -545,19 +636,10 @@ function buildRevealTransition() {
 
   syncAnchorSizes();
 
-  anchors.slice(1).forEach((anchor, index) => {
-    const section = anchor.closest('section');
-    const anchorIndex = index + 1;
-    if (!section) return;
-
-    ScrollTrigger.create({
-      trigger: section,
-      start: 'top 28%',
-      invalidateOnRefresh: true,
-      onEnter: () => { if (triggersReady) moveProductTo(anchorIndex); },
-      onLeaveBack: () => { if (triggersReady) moveProductTo(anchorIndex - 1); },
-    });
-  });
+  // Ownership is evaluated from the whole viewport instead of independent
+  // per-section threshold triggers. Five section reads per animation frame are
+  // cheap and, more importantly, produce one deterministic owner decision.
+  window.addEventListener('scroll', scheduleOwnershipEvaluation, { passive: true });
 
   ScrollTrigger.addEventListener('refreshInit', () => {
     if (!isTraveling) syncAnchorSizes();

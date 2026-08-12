@@ -1,0 +1,30 @@
+WSWSS Smart Product Ownership — 2026-08-12
+
+Root-cause change
+- Removed fixed "top 28%" section ownership thresholds.
+- Product ownership is now decided once per animation frame from the full viewport state.
+
+Ownership score
+- 62%: visible pixels as share of viewport
+- 30%: visible share of the section
+- 8%: focus affinity (tiebreaker only)
+- Fully visible section receives a small clarity bonus.
+
+Stability rules
+- Hysteresis prevents flip-flopping at section boundaries.
+- A tiny section sliver cannot steal ownership.
+- If the current owner is almost gone, hysteresis releases immediately.
+- A short semantic edge lock (8% of viewport, capped at 72px) keeps Hero ownership at the page start and final-section ownership at the page end.
+- Outside that small edge state, ownership immediately returns to visibility scoring.
+- Near top/bottom, the focus point smoothly shifts toward the document edge and remains only a tiebreaker.
+
+Preserved behavior
+- Zero-opacity atomic Standard <-> Section 3 image swap.
+- 0.58s travel timing.
+- Arc motion.
+- 82% overshoot / shock landing.
+- Transform-based traveler motion.
+- Responsive product destination geometry and all CSS layout.
+
+Cache
+- script.js cache key bumped to 20260812-37 in TH / EN / KO pages.
