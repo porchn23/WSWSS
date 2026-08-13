@@ -7,8 +7,9 @@ const translations = {
   en: {
     navProduct: 'PRODUCT', navReveal: 'SKIN REVEAL', navWhy: 'WHY WSWSS', navStandards: 'STANDARDS', navHow: 'HOW TO USE', headerOrder: 'ORDER NOW',
     heroToday: 'Today,', heroMakeup: 'makeup', heroBeautiful: 'looks beautiful.', heroBelief: 'Give makeup a break and let your skin feel light—beauty never takes a break! WSWSS helps skin look brighter and feel hydrated, for a naturally beautiful finish that feels light, comfortable, and never cakey.',
-    revealPremise: 'Natural makeup should not begin by covering up real skin.', revealTitleOne: 'Reveal your beauty,', revealTitleTwo: 'beyond what it was before.', revealBenefitOne: 'Show real skin', revealBenefitTwo: 'No floating look', revealBenefitThree: 'No dull cast',
-    fourBenefits: 'Doesn’t catch on facial hair · No pilling · Reduced transfer to clothing · Long-lasting water resistance · Easy to cleanse',
+    revealPremise: 'Natural makeup should not begin by covering up real skin.', revealTitleOne: 'Reveal your beauty,', revealTitleTwo: 'beyond what it was before.', revealBenefitOne: 'Show real skin', revealBenefitTwo: 'Long-lasting water resistance', revealBenefitThree: 'Easy to cleanse',
+    fourBenefitsLead: "WSWSS is a tone-up cream that doesn't...",
+    fourBenefits: 'Doesn’t stick to facial hair · No pilling · No transfer to clothing · No mask-like cast · No ashy cast',
     infoPayoff: 'Bright · Moisturized · Smooth',
     slideToneUpResult: 'Helps skin look brighter instantly', slideToneUpIngredients: 'Titanium Dioxide · Niacinamide', slideToneUpCopy: 'Naturally brighter-looking skin without an ashy or overly white cast.',
     slideMoistureResult: 'Adds and helps maintain moisture in the skin', slideMoistureIngredients: 'Glycerin · Butylene Glycol · Sodium Hyaluronate', slideMoistureCopy: 'Soft, hydrated, fresh-looking skin with tone-up that applies without pilling.',
@@ -23,8 +24,9 @@ const translations = {
   ko: {
     navProduct: '제품', navReveal: '피부 표현', navWhy: 'WSWSS 특징', navStandards: '제조 기준', navHow: '사용 방법', headerOrder: '주문하기',
     heroToday: '오늘은', heroMakeup: '메이크업 없이도', heroBeautiful: '예뻐요.', heroBelief: '메이크업은 잠시 쉬고, 피부는 가볍게. 아름다움은 쉴 수 없으니까! WSWSS로 피부를 맑고 촉촉하게, 본연의 아름다움은 자연스럽게 더 또렷하게. 가볍고 편안하게, 두껍거나 답답해 보이지 않게.',
-    revealPremise: '내추럴 메이크업은 본연의 피부를 가리는 것에서 시작하지 않습니다.', revealTitleOne: '피부 본연의 아름다움을', revealTitleTwo: '더 빛나게.', revealBenefitOne: '본연의 피부 표현', revealBenefitTwo: '들뜸 없는 피부', revealBenefitThree: '칙칙함 없는 피부',
-    fourBenefits: '잔털에 끼지 않음 · 밀림 없이 · 옷 묻어남 감소 · 오래가는 워터 레지스턴스 · 간편한 세안',
+    revealPremise: '내추럴 메이크업은 본연의 피부를 가리는 것에서 시작하지 않습니다.', revealTitleOne: '피부 본연의 아름다움을', revealTitleTwo: '더 빛나게.', revealBenefitOne: '본연의 피부 표현', revealBenefitTwo: '오래가는 워터 레지스턴스', revealBenefitThree: '간편한 세안',
+    fourBenefitsLead: 'WSWSS는 사용하면 이런 걱정 없이...',
+    fourBenefits: '잔털에 달라붙지 않음 · 밀림 없음 · 옷에 묻지 않음 · 들뜸 없음 · 잿빛 없음',
     infoPayoff: '맑게 · 촉촉하게 · 매끈하게',
     slideToneUpResult: '피부를 즉각 화사해 보이게 정돈', slideToneUpIngredients: 'Titanium Dioxide · Niacinamide', slideToneUpCopy: '자연스럽게 맑아 보이는 피부, 잿빛이나 과한 백탁감 없이.',
     slideMoistureResult: '피부에 수분을 채우고 유지하도록 도움', slideMoistureIngredients: 'Glycerin · Butylene Glycol · Sodium Hyaluronate', slideMoistureCopy: '부드럽고 촉촉하고 생기 있어 보이며 톤업은 밀림 없이.',
