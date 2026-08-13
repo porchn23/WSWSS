@@ -104,6 +104,65 @@ function setupLanguageSwitcher() {
 
 setupLanguageSwitcher();
 
+function setupSignatureGraphic() {
+  const images = [...document.querySelectorAll('.signature-glyph')];
+  if (!images.length) return;
+
+  const signature = 'Wswss';
+  let renderedSize = 0;
+
+  const resolveFontSize = () => {
+    if (window.matchMedia('(orientation: landscape) and (max-height: 520px) and (max-width: 991px)').matches) return 25;
+    if (window.matchMedia('(max-width: 991px)').matches) return 31;
+    return 42;
+  };
+
+  const render = () => {
+    const fontSize = resolveFontSize();
+    const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.round(430 * pixelRatio);
+    canvas.height = Math.round(150 * pixelRatio);
+    const context = canvas.getContext('2d');
+    if (!context) return;
+
+    context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+    context.fillStyle = '#f12835';
+    context.font = `500 ${fontSize}px "Maisonelle", "Caveat", cursive`;
+    context.textBaseline = 'alphabetic';
+
+    if ('letterSpacing' in context) {
+      context.letterSpacing = '-0.4px';
+      context.fillText(signature, 321, 119);
+    } else {
+      let x = 321;
+      [...signature].forEach((character) => {
+        context.fillText(character, x, 119);
+        x += context.measureText(character).width - 0.4;
+      });
+    }
+
+    const source = canvas.toDataURL('image/png');
+    images.forEach((image) => image.setAttribute('href', source));
+    renderedSize = fontSize;
+  };
+
+  const refresh = () => {
+    if (resolveFontSize() === renderedSize) return;
+    render();
+  };
+
+  render();
+  if (document.fonts?.load) {
+    document.fonts.load(`500 ${resolveFontSize()}px Maisonelle`).then(render).catch(() => {});
+  }
+
+  window.addEventListener('resize', refresh, { passive: true });
+  window.addEventListener('orientationchange', refresh, { passive: true });
+}
+
+setupSignatureGraphic();
+
 function applyReducedMotionState() {
   document.documentElement.classList.add('reduced-motion');
 }
@@ -113,7 +172,7 @@ function buildHeroTimeline() {
     strokeDasharray: 1,
     strokeDashoffset: 1,
   });
-  gsap.set('.signature-text', { opacity: 0, x: -7 });
+  gsap.set('.signature-glyph', { opacity: 0, x: -7 });
 
   return gsap.timeline({ defaults: { ease: 'power2.out' } })
     .from('.site-header', { y: -10, opacity: 0, duration: 0.4 })
@@ -122,7 +181,7 @@ function buildHeroTimeline() {
     .add(() => document.querySelector('.product-shot').classList.add('is-visible'), '-=0.1')
     .to('.pen-path', { strokeDashoffset: 0, duration: 0.46, ease: 'none' }, '-=0.28')
     .to('.signature-path', { strokeDashoffset: 0, duration: 0.2, ease: 'none' }, '-=0.1')
-    .to('.signature-text', { opacity: 1, x: 0, duration: 0.26, ease: 'power1.out' }, '-=0.1')
+    .to('.signature-glyph', { opacity: 1, x: 0, duration: 0.26, ease: 'power1.out' }, '-=0.1')
     .to('.signature-tail', { strokeDashoffset: 0, duration: 0.18, ease: 'none' }, '-=0.16')
     .from(['.brand-belief', '.story-button'], { y: 8, stagger: 0.05, duration: 0.34 }, '-=0.38')
     .from('.feature-item', { y: 6, opacity: 0, stagger: 0.025, duration: 0.26 }, '-=0.22');
