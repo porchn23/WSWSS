@@ -54,7 +54,17 @@
 .document-rail-intro { display: grid; gap: .42rem; padding: .35rem .45rem; }.document-rail-intro > span { color: #60817b; font-size: clamp(.64rem, .78vw, .76rem); }
 .document-card { display: grid; min-width: 0; gap: .35rem; margin: 0; text-align: center; }
 .document-card[role="button"] { cursor: zoom-in; }.document-card[role="button"]:focus-visible { outline: 2px solid var(--mint); outline-offset: .2rem; }
-.document-card img, .document-card--blank > span { display: grid; width: 100%; aspect-ratio: 1.31 / 1; place-items: center; border: 1px solid rgba(18,183,167,.24); border-radius: .2rem; background: #fff; object-fit: cover; }
+.document-card img, .document-card--blank > span {
+  display: grid;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 240 / 183;
+  place-items: center;
+  border: 1px solid rgba(18,183,167,.24);
+  border-radius: .2rem;
+  background: #fff;
+  object-fit: contain;
+}
 .document-card--blank > span { color: #90a7a1; background: rgba(255,255,255,.55); font-size: clamp(.48rem, .58vw, .62rem); line-height: 1.35; }.document-card figcaption { color: #61706c; font-size: clamp(.46rem, .58vw, .62rem); font-weight: 500; line-height: 1.35; }
 .document-modal[hidden] { display: none; }
 .document-modal { position: fixed; z-index: 100; inset: 0; display: grid; place-items: center; padding: 1.25rem; background: rgba(11, 32, 29, .64); backdrop-filter: blur(8px); }
@@ -2191,3 +2201,6 @@ svg {
     margin-bottom: 0.22rem;
   }
 }
+
+/* Performance-safe language font override: avoid requesting Thai glyphs on Korean page. */
+html[data-language="ko"] .formula-content h2 { font-family: "Noto Sans KR", sans-serif; }

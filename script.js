@@ -740,7 +740,7 @@ function buildDocumentModal() {
     const image = card.querySelector('img');
     if (!image) return;
     opener = card;
-    modalImage.src = image.currentSrc || image.src;
+    modalImage.src = image.dataset.full || image.currentSrc || image.src;
     modalImage.alt = image.alt;
     modalTitle.textContent = image.alt;
     modal.hidden = false;
