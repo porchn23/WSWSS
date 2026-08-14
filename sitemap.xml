@@ -1,27 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
     <loc>https://www.wswss.com/</loc>
-    <lastmod>2026-08-11</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>1.0</priority>
+    <lastmod>2026-08-14</lastmod>
+    <xhtml:link rel="alternate" hreflang="th" href="https://www.wswss.com/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.wswss.com/en/"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://www.wswss.com/ko/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.wswss.com/"/>
     <image:image>
-      <image:loc>https://www.wswss.com/assets/wswss-product-cutout.png</image:loc>
+      <image:loc>https://www.wswss.com/assets/wswss-product-cutout.webp</image:loc>
       <image:title>พรพรร WSWSS Bright Tone-Up Moisture Cream</image:title>
       <image:caption>ครีมโทนอัพเกาหลี WSWSS เนื้อบางเบา สำหรับผิวสวยแบบ Natural Look</image:caption>
     </image:image>
   </url>
   <url>
     <loc>https://www.wswss.com/en/</loc>
-    <lastmod>2026-08-12</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
+    <lastmod>2026-08-14</lastmod>
+    <xhtml:link rel="alternate" hreflang="th" href="https://www.wswss.com/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.wswss.com/en/"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://www.wswss.com/ko/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.wswss.com/"/>
   </url>
   <url>
     <loc>https://www.wswss.com/ko/</loc>
-    <lastmod>2026-08-12</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
+    <lastmod>2026-08-14</lastmod>
+    <xhtml:link rel="alternate" hreflang="th" href="https://www.wswss.com/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.wswss.com/en/"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://www.wswss.com/ko/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.wswss.com/"/>
   </url>
 </urlset>

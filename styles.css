@@ -1439,6 +1439,32 @@ html[data-language="en"] .use-price, html[data-language="ko"] .use-price { font-
   .reveal-product-benefits { right: 1rem; bottom: .8rem; left: 1rem; width: auto; font-size: .67rem; transform: none; }
 }
 
+/* Section 5 closing copy. Kept in the shared stylesheet to avoid a separate
+   render-blocking request on the Thai product page. */
+html[data-static-language="th"] #section-5 .use-cta-copy h2 {
+  font-size: clamp(1.55rem, 3vw, 2.8rem);
+  line-height: 1.08;
+}
+
+html[data-static-language="th"] #section-5 .use-cta-copy .use-functions {
+  margin: 0.55rem 0 0;
+  font-size: clamp(0.68rem, 0.85vw, 0.82rem);
+  line-height: 1.25;
+  letter-spacing: 0.08em;
+  opacity: 0.72;
+}
+
+@media (max-width: 699px) {
+  html[data-static-language="th"] #section-5 .use-cta-copy h2 {
+    font-size: clamp(1.55rem, 7vw, 2.2rem);
+  }
+
+  html[data-static-language="th"] #section-5 .use-cta-copy .use-functions {
+    font-size: 0.66rem;
+    letter-spacing: 0.05em;
+  }
+}
+
 /* Centre the Section 2 artwork on the left edge of the max-width site frame. */
 .reveal-face {
   top: 0;
