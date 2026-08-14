@@ -332,3 +332,15 @@
   .not-found-visual { min-height: 290px; }
   .not-found-visual::before { width: 260px; height: 260px; }
 }
+
+/* Localized legal typography */
+html[lang="ko"] body.legal-page,
+html[lang="ko"] body.not-found-page,
+html[lang="ko"] .cookie-consent-root {
+  font-family: "Noto Sans KR", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+html[lang="en"] body.legal-page,
+html[lang="en"] body.not-found-page,
+html[lang="en"] .cookie-consent-root {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
