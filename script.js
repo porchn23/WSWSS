@@ -362,6 +362,7 @@ function buildRevealTransition() {
     currentX: 0,
     raf: 0,
     active: false,
+    lastTime: 0,
   };
 
   function isDesktopBgParallaxEnabled() {
@@ -378,17 +379,25 @@ function buildRevealTransition() {
       window.cancelAnimationFrame(bgParallaxState.raf);
       bgParallaxState.raf = 0;
     }
+    bgParallaxState.lastTime = 0;
   }
 
-  function animateBgParallax() {
+  function animateBgParallax(timestamp) {
     bgParallaxState.raf = 0;
-    bgParallaxState.currentX += (bgParallaxState.targetX - bgParallaxState.currentX) * 0.12;
-    if (Math.abs(bgParallaxState.targetX - bgParallaxState.currentX) < 0.05) {
+    const elapsed = bgParallaxState.lastTime
+      ? Math.min(48, Math.max(0, timestamp - bgParallaxState.lastTime))
+      : 1000 / 60;
+    bgParallaxState.lastTime = timestamp;
+    const smoothing = 1 - Math.exp(-elapsed / 240);
+    bgParallaxState.currentX += (bgParallaxState.targetX - bgParallaxState.currentX) * smoothing;
+    if (Math.abs(bgParallaxState.targetX - bgParallaxState.currentX) < 0.04) {
       bgParallaxState.currentX = bgParallaxState.targetX;
     }
     applyBgParallaxX(bgParallaxState.currentX);
-    if (Math.abs(bgParallaxState.targetX - bgParallaxState.currentX) >= 0.05) {
+    if (Math.abs(bgParallaxState.targetX - bgParallaxState.currentX) >= 0.04) {
       bgParallaxState.raf = window.requestAnimationFrame(animateBgParallax);
+    } else {
+      bgParallaxState.lastTime = 0;
     }
   }
 
@@ -424,7 +433,7 @@ function buildRevealTransition() {
     const range = Math.max(productRect.width * 0.9, 180);
     const delta = event.clientX - centerX;
     const normalized = gsap.utils.clamp(-1, 1, delta / range);
-    const maxShift = 12;
+    const maxShift = 10;
     bgParallaxState.targetX = -normalized * maxShift;
     bgParallaxState.active = true;
     scheduleBgParallax();

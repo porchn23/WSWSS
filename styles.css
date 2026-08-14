@@ -1918,6 +1918,12 @@ html {
   scroll-padding-top: 1rem;
 }
 
+/* A very light optical softening for the active Section 5 backdrop.
+   The existing WebP remains unchanged, so this adds no network request. */
+.use-product-cg--active {
+  filter: blur(0.4px);
+}
+
 img,
 svg {
   max-width: 100%;
@@ -1964,9 +1970,12 @@ svg {
   }
 }
 
-@media (max-width: 420px) and (max-height: 740px) {
+/* Keep the portrait product footprint independent of browser chrome height.
+   A height-based breakpoint can toggle while the mobile URL bar collapses,
+   changing Section 4/5 padding and moving the document bottom mid-scroll. */
+@media (max-width: 420px) {
   :root {
-    --shared-product-width: min(70vw, 17rem);
+    --shared-product-width: min(76vw, 18.5rem);
   }
 }
 
