@@ -355,6 +355,90 @@ function buildRevealTransition() {
   const useProductAnchor = document.querySelector('.use-product');
   const useProductBackdrop = document.querySelector('.use-product-backdrop-persistent');
   const useProductIndex = anchors.findIndex((anchor) => anchor.classList.contains('use-product'));
+  const useProductStage = useProductBackdrop ? useProductBackdrop.parentElement : null;
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const bgParallaxState = {
+    targetX: 0,
+    currentX: 0,
+    raf: 0,
+    active: false,
+  };
+
+  function isDesktopBgParallaxEnabled() {
+    return window.innerWidth >= 992 && !prefersReducedMotion.matches;
+  }
+
+  function applyBgParallaxX(value) {
+    if (!useProductBackdrop) return;
+    useProductBackdrop.style.setProperty('--cg2-parallax-x', `${value.toFixed(2)}px`);
+  }
+
+  function stopBgParallaxLoop() {
+    if (bgParallaxState.raf) {
+      window.cancelAnimationFrame(bgParallaxState.raf);
+      bgParallaxState.raf = 0;
+    }
+  }
+
+  function animateBgParallax() {
+    bgParallaxState.raf = 0;
+    bgParallaxState.currentX += (bgParallaxState.targetX - bgParallaxState.currentX) * 0.12;
+    if (Math.abs(bgParallaxState.targetX - bgParallaxState.currentX) < 0.05) {
+      bgParallaxState.currentX = bgParallaxState.targetX;
+    }
+    applyBgParallaxX(bgParallaxState.currentX);
+    if (Math.abs(bgParallaxState.targetX - bgParallaxState.currentX) >= 0.05) {
+      bgParallaxState.raf = window.requestAnimationFrame(animateBgParallax);
+    }
+  }
+
+  function scheduleBgParallax() {
+    if (!bgParallaxState.raf) {
+      bgParallaxState.raf = window.requestAnimationFrame(animateBgParallax);
+    }
+  }
+
+  function resetBgParallax(immediate = false) {
+    bgParallaxState.targetX = 0;
+    bgParallaxState.active = false;
+    if (immediate) {
+      bgParallaxState.currentX = 0;
+      stopBgParallaxLoop();
+      applyBgParallaxX(0);
+      return;
+    }
+    scheduleBgParallax();
+  }
+
+  function handleBgParallaxPointer(event) {
+    if (!useProductBackdrop || !useProductAnchor || !useProductBackdrop.classList.contains('is-product-owned')) {
+      resetBgParallax();
+      return;
+    }
+    if (!isDesktopBgParallaxEnabled()) {
+      resetBgParallax(true);
+      return;
+    }
+    const productRect = useProductAnchor.getBoundingClientRect();
+    const centerX = productRect.left + (productRect.width / 2);
+    const range = Math.max(productRect.width * 0.9, 180);
+    const delta = event.clientX - centerX;
+    const normalized = gsap.utils.clamp(-1, 1, delta / range);
+    const maxShift = 12;
+    bgParallaxState.targetX = -normalized * maxShift;
+    bgParallaxState.active = true;
+    scheduleBgParallax();
+  }
+
+  function bindBgParallax() {
+    if (!useProductStage) return;
+    useProductStage.addEventListener('mousemove', handleBgParallaxPointer, { passive: true });
+    useProductStage.addEventListener('mouseleave', () => resetBgParallax(), { passive: true });
+    window.addEventListener('resize', () => {
+      if (!isDesktopBgParallaxEnabled()) resetBgParallax(true);
+    }, { passive: true });
+  }
+
 
   function syncUseProductBackdrop() {
     if (!useProductAnchor || !useProductBackdrop) return;
@@ -372,7 +456,9 @@ function buildRevealTransition() {
 
   function setUseProductOwned(isOwned) {
     if (!useProductBackdrop) return;
-    useProductBackdrop.classList.toggle('is-product-owned', Boolean(isOwned));
+    const owned = Boolean(isOwned);
+    useProductBackdrop.classList.toggle('is-product-owned', owned);
+    if (!owned) resetBgParallax();
   }
 
   // Transition rhythm: disappear quickly after departure, become fully hidden
@@ -729,6 +815,7 @@ function buildRevealTransition() {
 
   syncAnchorSizes();
   syncUseProductBackdrop();
+  bindBgParallax();
 
   // Ownership is evaluated from the whole viewport instead of independent
   // per-section threshold triggers. Five section reads per animation frame are
