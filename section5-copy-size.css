@@ -1,0 +1,25 @@
+/* Section 5 closing headline only: reduced to accommodate longer Thai copy. */
+#section-5 .use-cta-copy h2 {
+  font-size: clamp(1.55rem, 3vw, 2.8rem);
+  line-height: 1.08;
+}
+@media (max-width: 699px) {
+  #section-5 .use-cta-copy h2 {
+    font-size: clamp(1.55rem, 7vw, 2.2rem);
+  }
+}
+
+/* Section 5 CTA function line only. */
+#section-5 .use-cta-copy .use-functions {
+  margin: 0.55rem 0 0;
+  font-size: clamp(0.68rem, 0.85vw, 0.82rem);
+  line-height: 1.25;
+  letter-spacing: 0.08em;
+  opacity: 0.72;
+}
+@media (max-width: 699px) {
+  #section-5 .use-cta-copy .use-functions {
+    font-size: 0.66rem;
+    letter-spacing: 0.05em;
+  }
+}

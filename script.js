@@ -352,6 +352,29 @@ function buildRevealTransition() {
   let lastViewportWidth = window.innerWidth;
   let lastOrientation = window.innerWidth >= window.innerHeight ? 'landscape' : 'portrait';
 
+  const useProductAnchor = document.querySelector('.use-product');
+  const useProductBackdrop = document.querySelector('.use-product-backdrop-persistent');
+  const useProductIndex = anchors.findIndex((anchor) => anchor.classList.contains('use-product'));
+
+  function syncUseProductBackdrop() {
+    if (!useProductAnchor || !useProductBackdrop) return;
+    const stage = useProductBackdrop.parentElement;
+    if (!stage) return;
+    const stageRect = stage.getBoundingClientRect();
+    const productRect = useProductAnchor.getBoundingClientRect();
+    Object.assign(useProductBackdrop.style, {
+      left: `${productRect.left - stageRect.left}px`,
+      top: `${productRect.top - stageRect.top}px`,
+      width: `${productRect.width}px`,
+      height: `${productRect.height}px`,
+    });
+  }
+
+  function setUseProductOwned(isOwned) {
+    if (!useProductBackdrop) return;
+    useProductBackdrop.classList.toggle('is-product-owned', Boolean(isOwned));
+  }
+
   // Transition rhythm: disappear quickly after departure, become fully hidden
   // for the asset swap, then snap back into view before the landing shock.
   // The zero-opacity window is intentional and short: the traveler remains alive
@@ -537,6 +560,7 @@ function buildRevealTransition() {
     gsap.set(anchors, { autoAlpha: 0 });
     gsap.set(target, { autoAlpha: 1 });
     anchors.forEach((anchor, anchorIndex) => anchor.classList.toggle('is-visible', anchorIndex === index));
+    setUseProductOwned(index === useProductIndex);
     gsap.set(traveler, { display: 'none', opacity: 1 });
 
     settledIndex = index;
@@ -573,6 +597,7 @@ function buildRevealTransition() {
 
     targetIndex = nextIndex;
     isTraveling = true;
+    setUseProductOwned(false);
     setCopyVisible(false);
 
     const targetVariant = productVariantForIndex(nextIndex);
@@ -626,6 +651,10 @@ function buildRevealTransition() {
           scale: baseScale * transitionDepthScale(progress),
           opacity: transitionOpacity(progress, currentPosition.opacity),
         });
+
+        if (nextIndex === useProductIndex) {
+          setUseProductOwned(progress >= arrivalPoint);
+        }
 
         if (!productSwapped && progress >= 0.46) {
           swapTravelerVariantHidden(targetVariant);
@@ -687,6 +716,7 @@ function buildRevealTransition() {
     setProductVariant(anchors[nextIndex], productVariantForIndex(nextIndex));
     gsap.set(anchors[nextIndex], { autoAlpha: 1 });
     anchors.forEach((anchor, index) => anchor.classList.toggle('is-visible', index === nextIndex));
+    setUseProductOwned(nextIndex === useProductIndex);
     gsap.set(traveler, { display: 'none', opacity: 1, x: 0, y: 0, scale: 1 });
 
     settledIndex = nextIndex;
@@ -698,6 +728,7 @@ function buildRevealTransition() {
   }
 
   syncAnchorSizes();
+  syncUseProductBackdrop();
 
   // Ownership is evaluated from the whole viewport instead of independent
   // per-section threshold triggers. Five section reads per animation frame are
@@ -705,7 +736,10 @@ function buildRevealTransition() {
   window.addEventListener('scroll', scheduleOwnershipEvaluation, { passive: true });
 
   ScrollTrigger.addEventListener('refreshInit', () => {
-    if (!isTraveling) syncAnchorSizes();
+    if (!isTraveling) {
+      syncAnchorSizes();
+      syncUseProductBackdrop();
+    }
   });
 
   function refreshForMeaningfulResize() {
@@ -726,6 +760,7 @@ function buildRevealTransition() {
       isTraveling = false;
       triggersReady = false;
       syncAnchorSizes();
+      syncUseProductBackdrop();
       ScrollTrigger.refresh();
       settleProductAt(resolveActiveIndex());
       triggersReady = true;
@@ -744,6 +779,7 @@ function buildRevealTransition() {
     settledIndex = 0;
     targetIndex = 0;
     isTraveling = false;
+    setUseProductOwned(false);
     travelerVariant = productVariantForIndex(0);
     travelerBaseWidth = Math.max(1, anchors[0].getBoundingClientRect().width);
     setCopyVisible(false, true);
@@ -757,6 +793,7 @@ function buildRevealTransition() {
     if (isTraveling) return;
     triggersReady = false;
     syncAnchorSizes();
+    syncUseProductBackdrop();
     ScrollTrigger.refresh();
     const nextOwner = resolveActiveIndex(settledIndex);
     // Refresh geometry after fonts/assets settle, but do not re-toggle the current
